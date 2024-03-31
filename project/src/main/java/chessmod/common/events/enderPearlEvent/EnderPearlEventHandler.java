@@ -66,6 +66,10 @@ public class EnderPearlEventHandler {
                         // Link the two chessboards
                         linkChessboards(firstPos, secondPos);
 
+                        // Consume the enderpearl
+                        event.getEntity().getItemInHand(InteractionHand.MAIN_HAND).shrink(1);
+
+
                         // Reset for the next pair
                         firstPos = null;
                         firstNonce = -1;
