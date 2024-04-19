@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import chessmod.ChessMod;
 import chessmod.blockentity.ChessboardBlockEntity;
 import chessmod.blockentity.GoldChessboardBlockEntity;
+import chessmod.blockentity.QuantumChessBoardBlockEntity;
 import chessmod.common.capability.elo.Elo;
 import chessmod.common.dom.model.chess.Move;
 import chessmod.common.dom.model.chess.board.Board;
@@ -90,15 +91,27 @@ public class ChessPlay {
 								try { //On GoldChessBoard confirm that it is a valid move!
 									if (blockEntity instanceof GoldChessboardBlockEntity) {
 										board.moveSafely(m);
-										if(board.getCheckMate() != null) {
+
+										if (board.getCheckMate() != null) {
 											Logger.getGlobal().info(ctx.get().getSender().getName().getString() + " has won a chess game with themselves!");
 											Elo.updateElo(ctx.get().getSender(), ctx.get().getSender(), true);
+										}
+										if (blockEntity instanceof QuantumChessBoardBlockEntity cb) {
+											QuantumChessBoardBlockEntity qbe = cb.getLinkedBoard();
+											qbe.getBoard().moveSafely(m);
+											// update visuals of linked board on the client side
+											qbe.notifyClientOfBoardChange();
 										}
 									} else {
 										board.move(m);
 									}
-									((ChessboardBlockEntity)blockEntity).notifyClientOfBoardChange();
-									world.playSound(null, pos, sound, SoundSource.BLOCKS, 1F, 1F);
+									if (blockEntity instanceof QuantumChessBoardBlockEntity cb){
+										cb.notifyClientOfBoardChange();
+										world.playSound(null, pos, sound, SoundSource.BLOCKS, 1F, 1F);
+									} else{
+										((ChessboardBlockEntity)blockEntity).notifyClientOfBoardChange();
+										world.playSound(null, pos, sound, SoundSource.BLOCKS, 1F, 1F);
+									}
 								} catch (InvalidMoveException e) {
 									ChessMod.LOGGER.debug(e.getMessage());
 									e.printStackTrace();

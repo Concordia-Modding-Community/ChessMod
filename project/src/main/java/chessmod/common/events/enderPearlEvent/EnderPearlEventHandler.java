@@ -1,18 +1,20 @@
 package chessmod.common.events.enderPearlEvent;
 
 import chessmod.block.QuantumChessBoardBlock;
+import chessmod.blockentity.QuantumChessBoardBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.Interaction;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.common.Mod;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +35,7 @@ public class EnderPearlEventHandler {
     private long lastClickTime = -1;
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+    public void onRightClickLink(PlayerInteractEvent.RightClickBlock event) {
         long currentTime = System.currentTimeMillis();
 
         // Cooldown check
@@ -99,11 +101,13 @@ public class EnderPearlEventHandler {
         return block instanceof QuantumChessBoardBlock;
     }
 
-    private static final Map<BlockPos, BlockPos> linkedChessboards = new HashMap<>();
+    public static final Map<BlockPos, BlockPos> linkedChessboards = new HashMap<>();
 
     // Logic to link the chessboards
     private void linkChessboards(BlockPos first, BlockPos second) {
         if (first != null && second != null) {
+
+            // Link the chessboards to each other
             linkedChessboards.put(first, second);
             linkedChessboards.put(second, first);
         }
@@ -123,14 +127,10 @@ public class EnderPearlEventHandler {
             // event.getEntity().displayClientMessage(Component.literal("Second chessboard was already linked. Previous link removed."), false);
         }
 
-        // Link the chessboards to each other
-        linkedChessboards.put(first, second);
-        linkedChessboards.put(second, first);
 
-        //event.getEntity().displayClientMessage(Component.literal("Successfully linked chessboards at positions: " + first + " and " + second), false);}
-    }
+     }
 
-    private void unlinkChessboards(BlockPos pos) {
+    public void unlinkChessboards(BlockPos pos) {
         BlockPos linked = linkedChessboards.remove(pos);
         if (linked != null) {
             linkedChessboards.remove(linked);

@@ -3,6 +3,7 @@ package chessmod.setup;
 import chessmod.ChessMod;
 import chessmod.common.capability.elo.EloEvents;
 import chessmod.common.events.enderPearlEvent.EnderPearlEventHandler;
+//import chessmod.common.events.enderPearlEvent.UnlinkEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -18,6 +19,7 @@ public class ModSetup {
         bus.addListener(EloEvents::onPlayerCloned);
         bus.addListener(EloEvents::onRegisterCapabilities);
         bus.register(new EnderPearlEventHandler());
+        //bus.register(new UnlinkEvent());
     }
 
 }
