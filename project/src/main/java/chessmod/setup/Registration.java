@@ -69,7 +69,7 @@ public class Registration {
 	public static final RegistryObject<Block> QUANTUM_CHESSBOARD = BLOCKS.register("quantum_chessboard", QuantumChessBoardBlock::new);
 	public static final RegistryObject<BlockEntityType<QuantumChessBoardBlockEntity>> QUANTUM_CHESSBOARD_BE =
 			BLOCK_ENTITY_TYPES.register("quantum_chessboard",
-			()-> BlockEntityType.Builder.of(QuantumChessBoardBlockEntity::new, QUANTUM_CHESSBOARD.get()).build(null));
+					()-> BlockEntityType.Builder.of(QuantumChessBoardBlockEntity::new, QUANTUM_CHESSBOARD.get()).build(null));
 
 	public static final RegistryObject<Item> CHESS_WRENCH = ITEMS.register("chess_wrench", () -> new Item(new Item.Properties()));
 

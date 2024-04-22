@@ -7,14 +7,11 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import chessmod.blockentity.GoldChessboardBlockEntity;
 
-public class QuantumChessBoardBlockEntity extends GoldChessboardBlockEntity{
-//    public QuantumChessBoardBlockEntity(BlockPos pWorldPosition, BlockState pBlockState) {
-//        super(Registration.QUANTUM_CHESSBOARD_BE.get(), pWorldPosition, pBlockState);
-//    }
-
+public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
     public QuantumChessBoardBlockEntity(BlockPos pWorldPosition, BlockState pBlockState) {
-        super(pWorldPosition, pBlockState); // Remove the blockEntityType argument when extending GoldChessBaord
+        super(Registration.QUANTUM_CHESSBOARD_BE.get(), pWorldPosition, pBlockState);
     }
+
     public BlockPos linkedBoardPos;
 
     public void setLinkedBoardPos(BlockPos pos) {
