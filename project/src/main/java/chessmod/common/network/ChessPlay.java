@@ -18,7 +18,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
 
 
@@ -59,7 +58,9 @@ public class ChessPlay {
 
 	public static class Handler {
 		public static boolean handle(final ChessPlay message, final Supplier<NetworkEvent.Context> ctx) {
+
 			if (ctx.get().getDirection().getReceptionSide().isServer()) {
+				System.out.println("Attempting a chessplay");
 				ctx.get().enqueueWork(new Runnable() {
 					// Use anon - lambda causes classloading issues
 					@Override
@@ -67,12 +68,11 @@ public class ChessPlay {
 						Level world = ctx.get().getSender().level();
 						BlockPos pos = new BlockPos((int) message.x, (int) message.y, (int) message.z);
 						if(world.isLoaded(pos)) {
-							
-							BlockEntity blockEntity = world.getBlockEntity(pos);
-							if (blockEntity instanceof ChessboardBlockEntity) {
-								Board board = ((ChessboardBlockEntity)blockEntity).getBoard();
+
+							if (world.getBlockEntity(pos) instanceof ChessboardBlockEntity chessBlockEntity) {
+								Board board = chessBlockEntity.getBoard();
 								Move m = Move.create((int)message.move, board);
-								
+
 								SoundEvent sound = null;
 								if(board.pieceAt(m.getSource()) instanceof Knight) {
 									if(board.pieceAt(m.getTarget()) == null) {
@@ -89,36 +89,40 @@ public class ChessPlay {
 								}
 
 								try { //On GoldChessBoard confirm that it is a valid move!
-									if (blockEntity instanceof GoldChessboardBlockEntity) {
+									if (chessBlockEntity instanceof GoldChessboardBlockEntity || chessBlockEntity instanceof QuantumChessBoardBlockEntity) {
 										board.moveSafely(m);
 
 										if (board.getCheckMate() != null) {
 											Logger.getGlobal().info(ctx.get().getSender().getName().getString() + " has won a chess game with themselves!");
 											Elo.updateElo(ctx.get().getSender(), ctx.get().getSender(), true);
 										}
-										if (blockEntity instanceof QuantumChessBoardBlockEntity cb) {
-											QuantumChessBoardBlockEntity qbe = cb.getLinkedBoard();
-											qbe.getBoard().moveSafely(m);
-											// update visuals of linked board on the client side
-											qbe.notifyClientOfBoardChange();
+										if (chessBlockEntity instanceof QuantumChessBoardBlockEntity cbe) {
+											if(cbe.getLinkedBoardEntity() == null) {
+												Logger.getGlobal().info(ctx.get().getSender().getName().getString() + " played on an unlinked board!");
+											} else {
+												Logger.getGlobal().info(ctx.get().getSender().getName().getString() + " played on an linked board!");
+												cbe.getLinkedBoardEntity().getBoard().moveSafely(m);
+											}
 										}
 									} else {
 										board.move(m);
 									}
-									if (blockEntity instanceof QuantumChessBoardBlockEntity cb){
-										cb.notifyClientOfBoardChange();
-										world.playSound(null, pos, sound, SoundSource.BLOCKS, 1F, 1F);
-									} else{
-										((ChessboardBlockEntity)blockEntity).notifyClientOfBoardChange();
-										world.playSound(null, pos, sound, SoundSource.BLOCKS, 1F, 1F);
+
+									chessBlockEntity.notifyClientOfBoardChange();
+									world.playSound(null, pos, sound, SoundSource.BLOCKS, 1F, 1F);
+
+									if (chessBlockEntity instanceof QuantumChessBoardBlockEntity cbe){
+										cbe.getLinkedBoardEntity().notifyClientOfBoardChange();
+										world.playSound(null, cbe.getLinkedBoardPos(), sound, SoundSource.BLOCKS, 1F, 1F);
 									}
+
 								} catch (InvalidMoveException e) {
 									ChessMod.LOGGER.debug(e.getMessage());
 									e.printStackTrace();
 								}
 
 							}
-							
+
 						}
 					}
 				});

@@ -11,17 +11,6 @@ import net.minecraftforge.network.simple.SimpleChannel;
 
 
 public final class PacketHandler {
-	/*
-	private static final String PROTOCOL = "2";
-	
-	public static final SimpleChannel HANDLER = NetworkRegistry.newSimpleChannel(
-			new ResourceLocation(ChessMod.MODID, "chan"),
-			() -> PROTOCOL,
-			PROTOCOL::equals,
-			PROTOCOL::equals
-	);
-	*/
-	
 	public static final SimpleChannel HANDLER = NetworkRegistry.ChannelBuilder
     .named(new ResourceLocation(ChessMod.MODID, "messages"))
     .networkProtocolVersion(() -> "1.0")

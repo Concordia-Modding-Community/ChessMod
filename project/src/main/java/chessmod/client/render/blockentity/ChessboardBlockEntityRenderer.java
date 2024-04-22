@@ -1,5 +1,6 @@
 package chessmod.client.render.blockentity;
 
+import chessmod.blockentity.QuantumChessBoardBlockEntity;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -87,7 +88,7 @@ public class ChessboardBlockEntityRenderer implements BlockEntityRenderer<Chessb
 	public void render(ChessboardBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack,
 			MultiBufferSource pBufferSource, int pPackedLight, int pPackedOverlay) {
 
-		if(pBlockEntity instanceof GoldChessboardBlockEntity) {
+		if(pBlockEntity instanceof GoldChessboardBlockEntity || pBlockEntity instanceof QuantumChessBoardBlockEntity) {
 	        //Draw current-turn indicator:
 	        showTurnColor(pBufferSource, pPoseStack, pBlockEntity.getBoard().getCurrentPlayer(), pPackedLight, pPackedOverlay);
 		}
