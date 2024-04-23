@@ -96,12 +96,12 @@ public class ChessPlay {
 											Logger.getGlobal().info(ctx.get().getSender().getName().getString() + " has won a chess game with themselves!");
 											Elo.updateElo(ctx.get().getSender(), ctx.get().getSender(), true);
 										}
-										if (chessBlockEntity instanceof QuantumChessBoardBlockEntity cbe) {
-											if(cbe.getLinkedBoardEntity() == null) {
+										if (chessBlockEntity instanceof QuantumChessBoardBlockEntity qcbe) {
+											if(qcbe.getLinkedBoardEntity() == null) {
 												Logger.getGlobal().info(ctx.get().getSender().getName().getString() + " played on an unlinked board!");
 											} else {
 												Logger.getGlobal().info(ctx.get().getSender().getName().getString() + " played on an linked board!");
-												cbe.getLinkedBoardEntity().getBoard().moveSafely(m);
+												qcbe.getLinkedBoardEntity().getBoard().moveSafely(m);
 											}
 										}
 									} else {
@@ -111,9 +111,9 @@ public class ChessPlay {
 									chessBlockEntity.notifyClientOfBoardChange();
 									world.playSound(null, pos, sound, SoundSource.BLOCKS, 1F, 1F);
 
-									if (chessBlockEntity instanceof QuantumChessBoardBlockEntity cbe){
-										cbe.getLinkedBoardEntity().notifyClientOfBoardChange();
-										world.playSound(null, cbe.getLinkedBoardPos(), sound, SoundSource.BLOCKS, 1F, 1F);
+									if (chessBlockEntity instanceof QuantumChessBoardBlockEntity qcbe){
+										qcbe.getLinkedBoardEntity().notifyClientOfBoardChange();
+										world.playSound(null, qcbe.getLinkedBoardPos(), sound, SoundSource.BLOCKS, 1F, 1F);
 									}
 
 								} catch (InvalidMoveException e) {

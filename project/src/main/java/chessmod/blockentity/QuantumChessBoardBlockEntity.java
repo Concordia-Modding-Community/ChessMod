@@ -15,8 +15,20 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
 
     protected BlockPos linkedBoardPos;
 
+    /* linkedBoardStates needs a more comprehensive copying methos */
+    protected BlockState linkedBoardStates;
+
     public void setLinkedBoardPos(BlockPos pos) {
         this.linkedBoardPos = pos;
+    }
+
+    public BlockState getLinkedBoardState() { // getter for linkedBoardStates
+        return this.linkedBoardStates;
+    }
+
+    public void quantumImprint(QuantumChessBoardBlockEntity otherBoardState) {
+        // clone the internal chessboard state
+        this.linkedBoardStates = otherBoardState.linkedBoardStates; // Clone linkedBoardStates directly(does it really work??)
     }
 
     /**
@@ -71,6 +83,10 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
     }
 
     @Override
+    /* This methis is called when saving the
+     * block entity's data (serialization? encoding?)
+     * stores the linked board position coordinates as an integer array
+     * within the NBT data (linkedBoardPos) */
     protected void saveAdditional(CompoundTag pTag) {
         super.saveAdditional(pTag);
         if(getLinkedBoardPos() != null) {
@@ -78,6 +94,10 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
         }
     }
     @Override
+    /* This method is called when loading the
+     * block entity's data from NBT (deserialisation? decoding?)
+     * returns the stored linked board position from linkedBoardPos
+     */
     public void load(CompoundTag pTag) {
         super.load(pTag);
         int[] lbp = pTag.getIntArray("linkedBoardPos");

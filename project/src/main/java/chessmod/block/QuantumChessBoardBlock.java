@@ -89,6 +89,8 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
         if(firstPosition.equals(secondPosition)) throw new QuantumChessBoardBlockEntity.FailureToLinkQuantumChessBoardEntityException("Can't link to originating board.");
         if(level.getBlockEntity(firstPosition) instanceof QuantumChessBoardBlockEntity firstEntity){
             if(level.getBlockEntity(secondPosition) instanceof QuantumChessBoardBlockEntity secondEntity){
+                // Use quantumImprint to clone the board state before linking
+                firstEntity.quantumImprint(secondEntity);
                 firstEntity.setLinkedBoardPos(secondPosition);
                 firstEntity.notifyClientOfBoardChange();
                 secondEntity.setLinkedBoardPos(firstPosition);
