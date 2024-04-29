@@ -26,6 +26,17 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
         return this.linkedBoardStates;
     }
 
+    // Unique ID for the chessboard
+    private int chessboardID;
+
+    public int getChessboardID() {
+        return chessboardID;
+    }
+
+    public void setChessboardID(int chessboardID) {
+        this.chessboardID = chessboardID;
+    }
+
     public void quantumImprint(QuantumChessBoardBlockEntity otherBoardState) {
         // clone the internal chessboard state
         this.linkedBoardStates = otherBoardState.linkedBoardStates; // Clone linkedBoardStates directly(does it really work??)

@@ -45,43 +45,63 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
         }
     }
 
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
-                                 BlockHitResult pHit) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult pHit) {
 
         ItemStack heldItem = player.getMainHandItem();
-        if(!level.isClientSide && heldItem.is(Items.ENDER_PEARL)){
+        if (!level.isClientSide && heldItem.is(Items.ENDER_PEARL)) {
             System.out.println("Event fired for main hand with ender pearl");
             try {
                 CompoundTag nbtData = heldItem.getOrCreateTag();
+
                 if (nbtData.getInt("BlockPosX") == 0) {
-                    nbtData.putInt("BlockPosX", pos.getX());
-                    nbtData.putInt("BlockPosY", pos.getY());
-                    nbtData.putInt("BlockPosZ", pos.getZ());
-                    heldItem.setTag(nbtData);
-                    player.displayClientMessage(Component.literal("First chessboard selected at: " + pos), false);
+                    // first board selection
+                    QuantumChessBoardBlockEntity blockEntity = (QuantumChessBoardBlockEntity) level.getBlockEntity(pos);
+                    if (blockEntity != null) {
+                        nbtData.putInt("BlockPosX", pos.getX());
+                        nbtData.putInt("BlockPosY", pos.getY());
+                        nbtData.putInt("BlockPosZ", pos.getZ());
+                        // store unique ID in nbt
+                        nbtData.putInt("ChessboardID", blockEntity.getChessboardID());
+                        heldItem.setTag(nbtData);
+                        player.displayClientMessage(Component.literal("First chessboard selected at: " + pos), false);
+                    }
                 } else {
+                    // second boardselection
                     BlockPos firstPosition = new BlockPos(
                             nbtData.getInt("BlockPosX"),
                             nbtData.getInt("BlockPosY"),
                             nbtData.getInt("BlockPosZ"));
+                    // retrieve stored ID
+                    int storedID = nbtData.getInt("ChessboardID");
 
-                    player.displayClientMessage(Component.literal("Second chessboard selected at: " + pos), false);
-                    linkChessboards(player, level, firstPosition, pos);
-                    player.getItemInHand(InteractionHand.MAIN_HAND).shrink(1);
-
+                    QuantumChessBoardBlockEntity secondBoardEntity = (QuantumChessBoardBlockEntity) level.getBlockEntity(pos);
+                    if (secondBoardEntity != null && secondBoardEntity.getChessboardID() == storedID) {
+                        // id match link the chessboards
+                        linkChessboards(player, level, firstPosition, pos);
+                        player.getItemInHand(InteractionHand.MAIN_HAND).shrink(1);
+                        // clear stored data for next selection
+                        nbtData.remove("BlockPosX");
+                        nbtData.remove("BlockPosY");
+                        nbtData.remove("BlockPosZ");
+                        nbtData.remove("ChessboardID");
+                        heldItem.setTag(nbtData);
+                    } else {
+                        // Handle error if Ids don't match or not a chessboard block
+                        player.displayClientMessage(Component.literal("Selected boards don't match!"), false);
+                    }
                 }
             } catch (QuantumChessBoardBlockEntity.FailureToLinkQuantumChessBoardEntityException e) {
                 player.displayClientMessage(Component.literal(e.getMessage()), false);
             }
 
-
             return InteractionResult.PASS;
-        } else if (level.isClientSide && !heldItem.is(Items.ENDER_PEARL)){
+        } else if (level.isClientSide && !heldItem.is(Items.ENDER_PEARL)) {
             super.use(state, level, pos, player, hand, pHit);
         }
 
         return InteractionResult.SUCCESS;
     }
+
     private static String formatBlockPos(BlockPos pos) {
         return String.format("(%d, %d, %d)", pos.getX(), pos.getY(), pos.getZ());
     }
@@ -89,7 +109,7 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
         if(firstPosition.equals(secondPosition)) throw new QuantumChessBoardBlockEntity.FailureToLinkQuantumChessBoardEntityException("Can't link to originating board.");
         if(level.getBlockEntity(firstPosition) instanceof QuantumChessBoardBlockEntity firstEntity){
             if(level.getBlockEntity(secondPosition) instanceof QuantumChessBoardBlockEntity secondEntity){
-                // Use quantumImprint to clone the board state before linking
+                // use quantumImprint to clone the board state before linking
                 firstEntity.quantumImprint(secondEntity);
                 firstEntity.setLinkedBoardPos(secondPosition);
                 firstEntity.notifyClientOfBoardChange();
