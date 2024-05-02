@@ -1,11 +1,12 @@
 package chessmod.blockentity;
 
+import chessmod.common.dom.model.chess.board.Board;
+import chessmod.common.dom.model.chess.board.SerializedBoard;
 import chessmod.setup.Registration;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
@@ -15,31 +16,14 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
 
     protected BlockPos linkedBoardPos;
 
-    /* linkedBoardStates needs a more comprehensive copying methos */
-    protected BlockState linkedBoardStates;
-
     public void setLinkedBoardPos(BlockPos pos) {
         this.linkedBoardPos = pos;
     }
 
-    public BlockState getLinkedBoardState() { // getter for linkedBoardStates
-        return this.linkedBoardStates;
-    }
-
-    // Unique ID for the chessboard
-    private int chessboardID;
-
-    public int getChessboardID() {
-        return chessboardID;
-    }
-
-    public void setChessboardID(int chessboardID) {
-        this.chessboardID = chessboardID;
-    }
-
-    public void quantumImprint(QuantumChessBoardBlockEntity otherBoardState) {
+    public void quantumImprint(QuantumChessBoardBlockEntity otherBoard) {
         // clone the internal chessboard state
-        this.linkedBoardStates = otherBoardState.linkedBoardStates; // Clone linkedBoardStates directly(does it really work??)
+        Board b = SerializedBoard.serialize(getBoard()).deSerialize();
+        otherBoard.setBoard(b);
     }
 
     /**
@@ -131,4 +115,21 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
     public static class NotALinkedQuantumChessBoardEntityException extends Throwable {
     }
 
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        unlinkChessboard();
+    }
+
+    /**
+     * This unlinks a board by setting its
+     */
+    public void unlinkChessboard() {
+        if(hasLinkedBoard()) {
+            getLinkedBoardEntity().setLinkedBoardPos(null);
+            getLinkedBoardEntity().notifyClientOfBoardChange();
+        }
+        setLinkedBoardPos(null);
+        notifyClientOfBoardChange();
+    }
 }

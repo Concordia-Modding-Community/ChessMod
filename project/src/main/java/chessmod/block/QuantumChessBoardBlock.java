@@ -15,15 +15,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
-import java.util.Objects;
 
 public class QuantumChessBoardBlock extends GoldChessboardBlock {
     public QuantumChessBoardBlock(){
@@ -60,8 +57,6 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
                         nbtData.putInt("BlockPosX", pos.getX());
                         nbtData.putInt("BlockPosY", pos.getY());
                         nbtData.putInt("BlockPosZ", pos.getZ());
-                        // store unique ID in nbt
-                        nbtData.putInt("ChessboardID", blockEntity.getChessboardID());
                         heldItem.setTag(nbtData);
                         player.displayClientMessage(Component.literal("First chessboard selected at: " + pos), false);
                     }
@@ -71,11 +66,9 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
                             nbtData.getInt("BlockPosX"),
                             nbtData.getInt("BlockPosY"),
                             nbtData.getInt("BlockPosZ"));
-                    // retrieve stored ID
-                    int storedID = nbtData.getInt("ChessboardID");
 
                     QuantumChessBoardBlockEntity secondBoardEntity = (QuantumChessBoardBlockEntity) level.getBlockEntity(pos);
-                    if (secondBoardEntity != null && secondBoardEntity.getChessboardID() == storedID) {
+                    if (secondBoardEntity != null) {
                         // id match link the chessboards
                         linkChessboards(player, level, firstPosition, pos);
                         player.getItemInHand(InteractionHand.MAIN_HAND).shrink(1);
@@ -83,7 +76,6 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
                         nbtData.remove("BlockPosX");
                         nbtData.remove("BlockPosY");
                         nbtData.remove("BlockPosZ");
-                        nbtData.remove("ChessboardID");
                         heldItem.setTag(nbtData);
                     } else {
                         // Handle error if Ids don't match or not a chessboard block
@@ -109,6 +101,10 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
         if(firstPosition.equals(secondPosition)) throw new QuantumChessBoardBlockEntity.FailureToLinkQuantumChessBoardEntityException("Can't link to originating board.");
         if(level.getBlockEntity(firstPosition) instanceof QuantumChessBoardBlockEntity firstEntity){
             if(level.getBlockEntity(secondPosition) instanceof QuantumChessBoardBlockEntity secondEntity){
+                //Make sure the old boards are unlinked
+                firstEntity.unlinkChessboard();
+                secondEntity.unlinkChessboard();
+
                 // use quantumImprint to clone the board state before linking
                 firstEntity.quantumImprint(secondEntity);
                 firstEntity.setLinkedBoardPos(secondPosition);
