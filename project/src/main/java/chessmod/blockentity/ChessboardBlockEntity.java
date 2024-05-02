@@ -12,7 +12,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
-import org.jetbrains.annotations.NotNull;
 
 public abstract class ChessboardBlockEntity extends BlockEntity {
 	protected Board board;
@@ -23,6 +22,10 @@ public abstract class ChessboardBlockEntity extends BlockEntity {
 
 	public Board getBoard() {
 		return board;
+	}
+
+	public void setBoard(Board b) {
+		board = b;
 	}
 
 	@Override
