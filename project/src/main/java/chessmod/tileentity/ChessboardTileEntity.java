@@ -27,7 +27,7 @@ public abstract class ChessboardTileEntity extends TileEntity {
 	@OnlyIn(Dist.CLIENT)
 	public ChessboardRenderer chessboardRenderer;
 
-	protected Board board = BoardFactory.createBoard();
+	protected Board board;
 
 	public Board getBoard() {
 		return board;
@@ -57,6 +57,8 @@ public abstract class ChessboardTileEntity extends TileEntity {
 
 	public ChessboardTileEntity(TileEntityType<?> tileEntityTypeIn) {
 		super(tileEntityTypeIn);
+		initialize();
+
 	}
 
 	/**

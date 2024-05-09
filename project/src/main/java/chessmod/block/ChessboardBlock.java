@@ -59,6 +59,8 @@ public abstract class ChessboardBlock extends GlassBlock {
 	};
 
 
+
+
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		// Only open the gui on the physical client
@@ -89,7 +91,6 @@ public abstract class ChessboardBlock extends GlassBlock {
 		return ClockWise_Directions[(index+1) % ClockWise_Directions.length];
 	}
 
-/*
 	@Override
 	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, IFluidState fluid) {
 		if(player.getHeldItemMainhand().getItem().getRegistryName().getPath().equals("chess_wrench")) {
@@ -102,8 +103,6 @@ public abstract class ChessboardBlock extends GlassBlock {
 		}
 		return super.removedByPlayer(state, world, pos, player, willHarvest, fluid);
 	}
-
-*/
 
 	protected abstract void openGui(final World worldIn, final BlockPos pos);
 
