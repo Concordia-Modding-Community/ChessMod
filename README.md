@@ -11,16 +11,17 @@ So many things to take us to a solid 1.0. Lots of cool features suggested by the
 
 ### 0.7
 Focus on low-level mechanics for the chessboard.
- * [ ] Finish the board heirarchy [13]
-  * [ ] This means the tournament board [49]
+
   * [ ] This means bound boards [66] (linking boards at a distance, ender pearls)
-  * [ ] Chess Wrench, it will allow the players to rotate and reset the chessboard
+  * [x] Chess Wrench, it will allow the players to rotate and reset the chessboard
   * [x] This means a Chesses board ~[67]~ (with no Chesses)
   * [x] This means an AI board ~[68]~ (with no AI)
   * [x] This means a Puzzle board ~[43]~ (with no Puzzles)
 
 ### 0.8
 Focus on feedback, core visuals and optimizing the code/textures around visuals
+  * [ ] Finish the board heirarchy [13]
+  * [ ] This means the tournament board [49]
  * [ ] Make the Patchouli book for chesses [26]
  * [ ] Add orientation to the board ~[23]~ [24]
  * [ ] Add mechanism for free-piece setup [32]
