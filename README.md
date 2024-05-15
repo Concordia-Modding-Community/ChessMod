@@ -5,7 +5,7 @@ Adding Pippin Barr's Chesses to minecraft.
 If you'd like to support ChessMod and my various projects, check out my [Patreon page](https://www.patreon.com/ramoucurious). Your support gives you early access to new features, exclusive behind-the-scenes content, and a direct role in shaping future updates. Special Discord roles for members are coming soon (along with a Discord server, because who doesn't need more of those?)!
 
 ## Playing it
-You can grab the current version of the mod in the [mod folder](/ramou/ChessMod/raw/1.14.4/modpack/ChessMod-1.15.2-0.616.zip).
+You can grab the current version of the mod in the [mod folder](/ramou/ChessMod/raw/1.15.2/modpack/ChessMod-1.15.2-0.616.zip).
 
 You cab grab the current version as an instance that can be imported with something like MultiMC in the [modpack folder](modpack)
 
