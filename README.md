@@ -1,8 +1,11 @@
 # ChessMod
 Adding Pippin Barr's Chesses to minecraft.
 
+## Support ChessMod and More!
+If you'd like to support ChessMod and my various projects, check out my [Patreon page](https://www.patreon.com/ramoucurious). Your support gives you early access to new features, exclusive behind-the-scenes content, and a direct role in shaping future updates. Special Discord roles for members are coming soon (along with a Discord server, because who doesn't need more of those?)!
+
 ## Playing it
-You can grab the current version of the mod in the [mod folder](forge-1.14.4-28.2.0-mdk/mod).
+You can grab the current version of the mod in the [mod folder](/ramou/ChessMod/raw/1.17.1/modpack/ChessMod-1.17.1-0.616.zip).
 
 You cab grab the current version as an instance that can be imported with something like MultiMC in the [modpack folder](modpack)
 
@@ -12,14 +15,15 @@ So many things to take us to a solid 1.0. Lots of cool features suggested by the
 ### 0.7
 Focus on low-level mechanics for the chessboard.
  * [ ] Finish the board heirarchy [13]
-  * [ ] This means the tournament board [49]
-  * [ ] This means bound boards [66] (linking boards at a distance, ender pearls)
+  * [x] This means bound boards [66] (linking boards at a distance, ender pearls)
   * [x] This means a Chesses board ~[67]~ (with no Chesses)
   * [x] This means an AI board ~[68]~ (with no AI)
   * [x] This means a Puzzle board ~[43]~ (with no Puzzles)
+ * [x] Chess Wrench, it will allow the players to rotate and reset the chessboard
 
 ### 0.8
 Focus on feedback, core visuals and optimizing the code/textures around visuals
+ * [ ] This means the tournament board [49]
  * [ ] Make the Patchouli book for chesses [26]
  * [ ] Add orientation to the board ~[23]~ [24]
  * [ ] Add mechanism for free-piece setup [32]
