@@ -16,7 +16,6 @@ import chessmod.setup.Registration;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -109,11 +108,12 @@ public class ChessPlay {
 									}
 
 									chessBlockEntity.notifyClientOfBoardChange();
-									world.playSound(null, pos, sound, SoundSource.BLOCKS, 1F, 1F);
+									chessBlockEntity.playSoundForNearbyPlayers(sound);
+
 
 									if (chessBlockEntity instanceof QuantumChessBoardBlockEntity qcbe){
 										qcbe.getLinkedBoardEntity().notifyClientOfBoardChange();
-										world.playSound(null, qcbe.getLinkedBoardPos(), sound, SoundSource.BLOCKS, 1F, 1F);
+										qcbe.getLinkedBoardEntity().playSoundForNearbyPlayers(sound);
 									}
 
 								} catch (InvalidMoveException e) {

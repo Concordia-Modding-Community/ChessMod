@@ -46,7 +46,6 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
 
         ItemStack heldItem = player.getMainHandItem();
         if (!level.isClientSide && heldItem.is(Items.ENDER_PEARL)) {
-            System.out.println("Event fired for main hand with ender pearl");
             try {
                 CompoundTag nbtData = heldItem.getOrCreateTag();
 
@@ -58,7 +57,7 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
                         nbtData.putInt("BlockPosY", pos.getY());
                         nbtData.putInt("BlockPosZ", pos.getZ());
                         heldItem.setTag(nbtData);
-                        player.displayClientMessage(Component.literal("First chessboard selected at: " + pos), false);
+                        player.displayClientMessage(Component.translatable("chessmod.quantum.first_notification", pos.getX(), pos.getY(), pos.getZ()), false);
                     }
                 } else {
                     // second boardselection
@@ -79,11 +78,11 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
                         heldItem.setTag(nbtData);
                     } else {
                         // Handle error if Ids don't match or not a chessboard block
-                        player.displayClientMessage(Component.literal("Selected boards don't match!"), false);
+                        player.displayClientMessage(Component.translatable("chessmod.quantum.unmatched_board_notification"), false);
                     }
                 }
             } catch (QuantumChessBoardBlockEntity.FailureToLinkQuantumChessBoardEntityException e) {
-                player.displayClientMessage(Component.literal(e.getMessage()), false);
+                player.displayClientMessage(Component.translatable(e.getMessage()), false);
             }
 
             return InteractionResult.PASS;
@@ -94,11 +93,8 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
         return InteractionResult.SUCCESS;
     }
 
-    private static String formatBlockPos(BlockPos pos) {
-        return String.format("(%d, %d, %d)", pos.getX(), pos.getY(), pos.getZ());
-    }
     private void linkChessboards(Player player, Level level, BlockPos firstPosition, BlockPos secondPosition) throws QuantumChessBoardBlockEntity.FailureToLinkQuantumChessBoardEntityException {
-        if(firstPosition.equals(secondPosition)) throw new QuantumChessBoardBlockEntity.FailureToLinkQuantumChessBoardEntityException("Can't link to originating board.");
+        if(firstPosition.equals(secondPosition)) throw new QuantumChessBoardBlockEntity.FailureToLinkQuantumChessBoardEntityException("chessmod.quantum.circular_linkage_notification");
         if(level.getBlockEntity(firstPosition) instanceof QuantumChessBoardBlockEntity firstEntity){
             if(level.getBlockEntity(secondPosition) instanceof QuantumChessBoardBlockEntity secondEntity){
                 //Make sure the old boards are unlinked
@@ -111,12 +107,13 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
                 firstEntity.notifyClientOfBoardChange();
                 secondEntity.setLinkedBoardPos(firstPosition);
                 secondEntity.notifyClientOfBoardChange();
-                player.displayClientMessage(Component.literal(String.format("The board at %s is now quantum-linked to the board at %s.",
-                        formatBlockPos(firstPosition), formatBlockPos(secondPosition))), false);
+                player.displayClientMessage(Component.translatable("chessmod.quantum.second_notification",
+                        firstPosition.getX(), firstPosition.getY(), firstPosition.getZ(),
+                        secondPosition.getX(), secondPosition.getY(), secondPosition.getZ()), false);
                 return;
             }
         }
-        throw new QuantumChessBoardBlockEntity.FailureToLinkQuantumChessBoardEntityException("Both linked boards must be Quantum Chess Boards.");
+        throw new QuantumChessBoardBlockEntity.FailureToLinkQuantumChessBoardEntityException("chessmod.quantum.unmatched_board_notification");
     }
 
 }
