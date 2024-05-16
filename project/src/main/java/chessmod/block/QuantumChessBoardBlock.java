@@ -22,12 +22,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import java.util.Random;
-
 
 public class QuantumChessBoardBlock extends GoldChessboardBlock {
-
-
     public QuantumChessBoardBlock(){
         super();
     }
@@ -65,7 +61,7 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
                         heldItem.setTag(nbtData);
                         player.displayClientMessage(Component.literal("First chessboard selected at: " + pos), false);
                         // spawn particle effect
-                        level.addParticle(ParticleTypes.END_ROD, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 0, 0, 0);
+                        //level.addParticle(ParticleTypes.END_ROD, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 0, 0, 0);
 
                     }
                 } else {
@@ -87,7 +83,9 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
                         heldItem.setTag(nbtData);
 
                         // spawn particle effet
-                        level.addParticle(ParticleTypes.END_ROD, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 0, 0, 0);
+                        level.addParticle(ParticleTypes.END_ROD, pos.getX() , pos.getY() , pos.getZ() , 0, 0, 0);
+
+
                     } else {
                         // Handle error if Ids don't match or not a chessboard block
                         player.displayClientMessage(Component.literal("Selected boards don't match!"), false);
@@ -95,10 +93,13 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
                 }
             } catch (QuantumChessBoardBlockEntity.FailureToLinkQuantumChessBoardEntityException e) {
                 player.displayClientMessage(Component.literal(e.getMessage()), false);
-            }return InteractionResult.PASS;
+            }
+
+            return InteractionResult.PASS;
         } else if (level.isClientSide && !heldItem.is(Items.ENDER_PEARL)) {
             super.use(state, level, pos, player, hand, pHit);
         }
+
         return InteractionResult.SUCCESS;
     }
 
