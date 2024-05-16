@@ -7,6 +7,7 @@ import chessmod.blockentity.QuantumChessBoardBlockEntity;
 import chessmod.client.gui.entity.GoldChessboardGui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -21,8 +22,12 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import java.util.Random;
+
 
 public class QuantumChessBoardBlock extends GoldChessboardBlock {
+
+
     public QuantumChessBoardBlock(){
         super();
     }
@@ -59,6 +64,9 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
                         nbtData.putInt("BlockPosZ", pos.getZ());
                         heldItem.setTag(nbtData);
                         player.displayClientMessage(Component.literal("First chessboard selected at: " + pos), false);
+                        // spawn particle effect
+                        level.addParticle(ParticleTypes.END_ROD, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 0, 0, 0);
+
                     }
                 } else {
                     // second boardselection
@@ -77,6 +85,9 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
                         nbtData.remove("BlockPosY");
                         nbtData.remove("BlockPosZ");
                         heldItem.setTag(nbtData);
+
+                        // spawn particle effet
+                        level.addParticle(ParticleTypes.END_ROD, pos.getX() + 0.5, pos.getY() + 1, pos.getZ() + 0.5, 0, 0, 0);
                     } else {
                         // Handle error if Ids don't match or not a chessboard block
                         player.displayClientMessage(Component.literal("Selected boards don't match!"), false);
@@ -84,19 +95,17 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
                 }
             } catch (QuantumChessBoardBlockEntity.FailureToLinkQuantumChessBoardEntityException e) {
                 player.displayClientMessage(Component.literal(e.getMessage()), false);
-            }
-
-            return InteractionResult.PASS;
+            }return InteractionResult.PASS;
         } else if (level.isClientSide && !heldItem.is(Items.ENDER_PEARL)) {
             super.use(state, level, pos, player, hand, pHit);
         }
-
         return InteractionResult.SUCCESS;
     }
 
     private static String formatBlockPos(BlockPos pos) {
         return String.format("(%d, %d, %d)", pos.getX(), pos.getY(), pos.getZ());
     }
+
     private void linkChessboards(Player player, Level level, BlockPos firstPosition, BlockPos secondPosition) throws QuantumChessBoardBlockEntity.FailureToLinkQuantumChessBoardEntityException {
         if(firstPosition.equals(secondPosition)) throw new QuantumChessBoardBlockEntity.FailureToLinkQuantumChessBoardEntityException("Can't link to originating board.");
         if(level.getBlockEntity(firstPosition) instanceof QuantumChessBoardBlockEntity firstEntity){
