@@ -20,6 +20,10 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
         this.linkedBoardPos = pos;
     }
 
+    public boolean isLinked() {
+        return linkedBoardPos != null;
+    }
+
     public void quantumImprint(QuantumChessBoardBlockEntity otherBoard) {
         // clone the internal chessboard state
         Board b = SerializedBoard.serialize(getBoard()).deSerialize();
@@ -97,7 +101,7 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
         super.load(pTag);
         int[] lbp = pTag.getIntArray("linkedBoardPos");
         if(lbp.length != 3) {
-           linkedBoardPos = null;
+            linkedBoardPos = null;
         } else {
             linkedBoardPos = new BlockPos(lbp[0], lbp[1], lbp[2]);
         }

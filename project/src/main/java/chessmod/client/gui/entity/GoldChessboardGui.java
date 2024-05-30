@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import chessmod.setup.Registration;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 
 import chessmod.ChessMod;
@@ -18,8 +20,11 @@ import chessmod.common.dom.model.chess.piece.InvalidMoveException;
 import chessmod.common.dom.model.chess.piece.Pawn;
 import chessmod.common.dom.model.chess.piece.Piece;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class GoldChessboardGui extends ChessboardGUI {
+
+	//public static final ResourceLocation QUANTUM_CHESSBOARD_GLINT = new ResourceLocation("chessmod", "quantum_chessboard_glint");
 
 	public GoldChessboardGui(ChessboardBlockEntity board) {
 		super(board);

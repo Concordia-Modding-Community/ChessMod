@@ -30,16 +30,19 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+
 
 
 public abstract class ChessboardBlock extends GlassBlock implements EntityBlock {
 	public static final DirectionProperty FACING = BlockStateProperties.FACING;
+	public static final BooleanProperty IS_LINKED = BooleanProperty.create("is_linked");
+
 	public ChessboardBlock() {
 		super(BlockBehaviour.Properties.of().noOcclusion());
-		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
+		this.registerDefaultState(this.stateDefinition.any()
+				.setValue(FACING, Direction.NORTH)
+				.setValue(IS_LINKED, false));
 	}
 	 
 	@Override
@@ -99,13 +102,13 @@ public abstract class ChessboardBlock extends GlassBlock implements EntityBlock 
     	//carefully at a later date. 
         Direction face = context.getNearestLookingDirection().getOpposite();
         if(face == Direction.UP || face == Direction.DOWN) face = Direction.NORTH;
-		return this.defaultBlockState().setValue(BlockStateProperties.FACING, face);
+		return this.defaultBlockState().setValue(BlockStateProperties.FACING, face).setValue(IS_LINKED, false);
     }
 
 	
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING);
+        builder.add(FACING, IS_LINKED);
     }
 
 }
