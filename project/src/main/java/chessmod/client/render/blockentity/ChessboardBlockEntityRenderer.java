@@ -103,9 +103,6 @@ public class ChessboardBlockEntityRenderer implements BlockEntityRenderer<Chessb
 	        //Draw current-turn indicator:
 	        showTurnColor(pBufferSource, pPoseStack, pBlockEntity.getBoard().getCurrentPlayer(), pPackedLight, pPackedOverlay);
 		}
-		if (pBlockEntity.is_linked()) {
-			renderLinkedIndicator(pBlockEntity, pPoseStack, pBufferSource, pPackedLight, pPackedOverlay);
-		}
 
         pPoseStack.pushPose();
         rotateForBoardFacing(pBlockEntity, pPoseStack);
@@ -200,30 +197,6 @@ public class ChessboardBlockEntityRenderer implements BlockEntityRenderer<Chessb
         }
 	}
 
-
-	public void renderLinkedIndicator(ChessboardBlockEntity pBlockEntity, PoseStack pPoseStack, MultiBufferSource pBufferSource, int pPackedLight, int pPackedOverlay) {
-		// TODO: rendering logic for linked boards
-		boolean isLinked = pBlockEntity.is_linked();
-		ModelResourceLocation modelLocation = isLinked ? LINKED_MODEL : NORMAL_MODEL;
-		BakedModel model = Minecraft.getInstance().getModelManager().getModel(modelLocation);
-
-		// Determine the texture to use based on the linked state
-		ResourceLocation textureLocation = isLinked ? LINKED_TEXTURE : NORMAL_TEXTURE;
-		TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(textureLocation);
-
-		pPoseStack.pushPose();
-		pPoseStack.translate(0.5D, 0.5D, 0.5D);
-		pPoseStack.mulPose(pBlockEntity.getBlockState().getValue(ChessboardBlock.FACING).getRotation());
-		pPoseStack.translate(-0.5D, -0.5D, -0.5D);
-
-		VertexConsumer vertexConsumer = pBufferSource.getBuffer(RenderType.entityCutout(sprite.atlasLocation()));
-		Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(pPoseStack.last(), vertexConsumer, pBlockEntity.getBlockState(), model, 1.0F, 1.0F, 1.0F, pPackedLight, pPackedOverlay);
-
-		pPoseStack.popPose();
-
-	}
-
-	
 	private void drawBishop(int bx, int bz, PoseStack pPoseStack, VertexConsumer  bufferbuilder, int pPackedLight, int pPackedOverlay) {
 		drawPiece(0.02f, bx, bz, pPoseStack, bufferbuilder, pPackedLight, pPackedOverlay, 0, 0, 0);        
 		drawPiece(0.02f, bx, bz, pPoseStack, bufferbuilder, pPackedLight, pPackedOverlay, 0, 0.04, 0);

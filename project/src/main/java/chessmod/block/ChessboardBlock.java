@@ -17,7 +17,6 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ChangeOverTimeBlock;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.GlassBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -30,21 +29,23 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-
 
 
 public abstract class ChessboardBlock extends GlassBlock implements EntityBlock {
 	public static final DirectionProperty FACING = BlockStateProperties.FACING;
-	public static final BooleanProperty IS_LINKED = BooleanProperty.create("is_linked");
+
 
 	public ChessboardBlock() {
 		super(BlockBehaviour.Properties.of().noOcclusion());
-		this.registerDefaultState(this.stateDefinition.any()
-				.setValue(FACING, Direction.NORTH)
-				.setValue(IS_LINKED, false));
+		doRegisterDefaultState();
+
 	}
-	 
+
+	public void doRegisterDefaultState() {
+		this.registerDefaultState(this.stateDefinition.any()
+				.setValue(FACING, Direction.NORTH));
+	}
+
 	@Override
 	public VoxelShape getVisualShape(BlockState state, BlockGetter level, net.minecraft.core.BlockPos pos, CollisionContext context) {
 		VoxelShape BOARD = Block.box(0.0D, 12.0D, 0.0D, 16.0D, 16.0D, 16.0D);
@@ -102,13 +103,13 @@ public abstract class ChessboardBlock extends GlassBlock implements EntityBlock 
     	//carefully at a later date. 
         Direction face = context.getNearestLookingDirection().getOpposite();
         if(face == Direction.UP || face == Direction.DOWN) face = Direction.NORTH;
-		return this.defaultBlockState().setValue(BlockStateProperties.FACING, face).setValue(IS_LINKED, false);
+		return this.defaultBlockState().setValue(BlockStateProperties.FACING, face);
     }
 
-	
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, IS_LINKED);
-    }
+	@Override
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+		builder.add(FACING);
+	}
+
 
 }

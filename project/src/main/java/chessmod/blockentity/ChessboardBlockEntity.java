@@ -1,5 +1,6 @@
 package chessmod.blockentity;
 
+import chessmod.block.QuantumChessBoardBlock;
 import chessmod.common.dom.model.chess.board.Board;
 import chessmod.common.dom.model.chess.board.BoardFactory;
 import chessmod.common.dom.model.chess.board.SerializedBoard;
@@ -15,13 +16,8 @@ import net.minecraft.world.phys.AABB;
 
 public abstract class ChessboardBlockEntity extends BlockEntity {
 	protected Board board;
-	private boolean is_linked;
-	public boolean is_linked() { return is_linked;}
 
-	public void set_linked(boolean linked) {
-		is_linked = linked;
-		//notifyClientOfBoardChange();  // Notify client of state change but is that necessary?
-	}
+
 
 	public void initialize() {
 		this.board = BoardFactory.createBoard();
@@ -51,7 +47,6 @@ public abstract class ChessboardBlockEntity extends BlockEntity {
 	public ChessboardBlockEntity(BlockEntityType<?> blockEntityTypeIn, BlockPos pWorldPosition, BlockState pBlockState) {
 		super(blockEntityTypeIn, pWorldPosition, pBlockState);
 		initialize();
-		this.is_linked = false;
 	}
 
 	@Override
@@ -61,7 +56,6 @@ public abstract class ChessboardBlockEntity extends BlockEntity {
 		pTag.putLong("piece_mask", sb.piece_mask);
 		pTag.putLongArray("pieces", sb.pieces);
 		pTag.putLongArray("moves", sb.moves);
-		pTag.putBoolean("is_linked", is_linked);
 	}
 	
 	@Override
@@ -75,7 +69,6 @@ public abstract class ChessboardBlockEntity extends BlockEntity {
 		} else {
 			board = new SerializedBoard(pieceMask, pieces, moves).deSerialize();
 		}
-		is_linked = pTag.getBoolean("is_linked");
 	}
 	
 	

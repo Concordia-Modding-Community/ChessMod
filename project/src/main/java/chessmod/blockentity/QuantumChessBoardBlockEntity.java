@@ -1,5 +1,6 @@
 package chessmod.blockentity;
 
+import chessmod.block.QuantumChessBoardBlock;
 import chessmod.common.dom.model.chess.board.Board;
 import chessmod.common.dom.model.chess.board.SerializedBoard;
 import chessmod.setup.Registration;
@@ -18,10 +19,6 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
 
     public void setLinkedBoardPos(BlockPos pos) {
         this.linkedBoardPos = pos;
-    }
-
-    public boolean isLinked() {
-        return linkedBoardPos != null;
     }
 
     public void quantumImprint(QuantumChessBoardBlockEntity otherBoard) {
@@ -131,9 +128,26 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
     public void unlinkChessboard() {
         if(hasLinkedBoard()) {
             getLinkedBoardEntity().setLinkedBoardPos(null);
+            assignLinkState(false);
             getLinkedBoardEntity().notifyClientOfBoardChange();
         }
+
         setLinkedBoardPos(null);
         notifyClientOfBoardChange();
     }
+    
+    public void linkChessboard(BlockPos linkedPos) {
+        setLinkedBoardPos(linkedPos);
+        assignLinkState(true);
+        notifyClientOfBoardChange();
+    }
+
+    private void assignLinkState(boolean linked) {
+        BlockState bs = level.getBlockState(this.getBlockPos());
+        bs = bs.setValue(QuantumChessBoardBlock.IS_LINKED, linked);
+        //BlockFlags.BLOCK_UPDATE = 2
+        //BlockFlags.FORCE_STATE = 32
+        level.setBlock(this.getBlockPos(),bs, 34);
+    }
+
 }
