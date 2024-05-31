@@ -1,7 +1,7 @@
 {
 	"__comment": "Designed by Sthiel with Cubik Studio - https://cubik.studio",
 	"textures": {
-		"particle": "minecraft:block/gold_block",
+		"particle": "minecraft:block/redstone_block",
 		"texture": "chessmod:block/chessboardtop",
 		"stand": "minecraft:block/redstone_block"
 	},

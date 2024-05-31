@@ -13,6 +13,7 @@
   "block.chessmod.chesses_chessboard": "Un échiquier pour Chesses",
   "block.chessmod.ai_chessboard": "Un échiquier IA",
   "block.chessmod.puzzle_chessboard": "Un échiquier casse-tête",
+  "block.chessmod.quantum_chessboard": "Un échiquier quantique",
 
   "item.chessmod.chess_wrench": "Une clé à échecs",
   "advancement.chessmod:woodChessboardPickup": "Ça devient sérieux!",

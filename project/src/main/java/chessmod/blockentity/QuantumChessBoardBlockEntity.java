@@ -1,5 +1,6 @@
 package chessmod.blockentity;
 
+import chessmod.block.QuantumChessBoardBlock;
 import chessmod.common.dom.model.chess.board.Board;
 import chessmod.common.dom.model.chess.board.SerializedBoard;
 import chessmod.setup.Registration;
@@ -97,7 +98,7 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
         super.load(pTag);
         int[] lbp = pTag.getIntArray("linkedBoardPos");
         if(lbp.length != 3) {
-           linkedBoardPos = null;
+            linkedBoardPos = null;
         } else {
             linkedBoardPos = new BlockPos(lbp[0], lbp[1], lbp[2]);
         }
@@ -127,9 +128,26 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
     public void unlinkChessboard() {
         if(hasLinkedBoard()) {
             getLinkedBoardEntity().setLinkedBoardPos(null);
+            assignLinkState(false);
             getLinkedBoardEntity().notifyClientOfBoardChange();
         }
+
         setLinkedBoardPos(null);
         notifyClientOfBoardChange();
     }
+    
+    public void linkChessboard(BlockPos linkedPos) {
+        setLinkedBoardPos(linkedPos);
+        assignLinkState(true);
+        notifyClientOfBoardChange();
+    }
+
+    private void assignLinkState(boolean linked) {
+        BlockState bs = level.getBlockState(this.getBlockPos());
+        bs = bs.setValue(QuantumChessBoardBlock.IS_LINKED, linked);
+        //BlockFlags.BLOCK_UPDATE = 2
+        //BlockFlags.FORCE_STATE = 32
+        level.setBlock(this.getBlockPos(),bs, 34);
+    }
+
 }

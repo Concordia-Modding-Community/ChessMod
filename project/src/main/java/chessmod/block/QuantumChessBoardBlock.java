@@ -7,6 +7,7 @@ import chessmod.blockentity.QuantumChessBoardBlockEntity;
 import chessmod.client.gui.entity.GoldChessboardGui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -14,17 +15,47 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 
 public class QuantumChessBoardBlock extends GoldChessboardBlock {
-    public QuantumChessBoardBlock(){
-        super();
+    public static final BooleanProperty IS_LINKED = BooleanProperty.create("is_linked");
+
+    public void doRegisterDefaultState() {
+        this.registerDefaultState(this.stateDefinition.any()
+                .setValue(FACING, Direction.NORTH)
+                .setValue(IS_LINKED, false));
+    }
+
+
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return super.getStateForPlacement(context).setValue(IS_LINKED, false);
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
+        builder.add(IS_LINKED);
+    }
+
+    private boolean is_linked;
+    public boolean is_linked() { return is_linked;}
+
+    public void set_linked(boolean linked) {
+        is_linked = linked;
+        //notifyClientOfBoardChange();  // Notify client of state change but is that necessary?
     }
 
     @Nullable
@@ -32,7 +63,7 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state){
         return new QuantumChessBoardBlockEntity(pos, state);
     }
-    
+
     @OnlyIn(Dist.CLIENT)
     @Override
     protected void openGui(final Level levelIn, final BlockPos pos){
@@ -45,6 +76,11 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult pHit) {
 
         ItemStack heldItem = player.getMainHandItem();
+
+        if(!heldItem.is(Items.ENDER_PEARL)) {
+            return super.use(state, level, pos, player, hand, pHit);
+        }
+
         if (!level.isClientSide && heldItem.is(Items.ENDER_PEARL)) {
             System.out.println("Event fired for main hand with ender pearl");
             try {
@@ -59,6 +95,7 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
                         nbtData.putInt("BlockPosZ", pos.getZ());
                         heldItem.setTag(nbtData);
                         player.displayClientMessage(Component.literal("First chessboard selected at: " + pos), false);
+
                     }
                 } else {
                     // second boardselection
@@ -77,6 +114,10 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
                         nbtData.remove("BlockPosY");
                         nbtData.remove("BlockPosZ");
                         heldItem.setTag(nbtData);
+
+
+
+
                     } else {
                         // Handle error if Ids don't match or not a chessboard block
                         player.displayClientMessage(Component.literal("Selected boards don't match!"), false);
@@ -97,6 +138,7 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
     private static String formatBlockPos(BlockPos pos) {
         return String.format("(%d, %d, %d)", pos.getX(), pos.getY(), pos.getZ());
     }
+
     private void linkChessboards(Player player, Level level, BlockPos firstPosition, BlockPos secondPosition) throws QuantumChessBoardBlockEntity.FailureToLinkQuantumChessBoardEntityException {
         if(firstPosition.equals(secondPosition)) throw new QuantumChessBoardBlockEntity.FailureToLinkQuantumChessBoardEntityException("Can't link to originating board.");
         if(level.getBlockEntity(firstPosition) instanceof QuantumChessBoardBlockEntity firstEntity){
@@ -105,12 +147,17 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
                 firstEntity.unlinkChessboard();
                 secondEntity.unlinkChessboard();
 
+
                 // use quantumImprint to clone the board state before linking
                 firstEntity.quantumImprint(secondEntity);
-                firstEntity.setLinkedBoardPos(secondPosition);
-                firstEntity.notifyClientOfBoardChange();
-                secondEntity.setLinkedBoardPos(firstPosition);
-                secondEntity.notifyClientOfBoardChange();
+                firstEntity.linkChessboard(secondPosition);
+                secondEntity.linkChessboard(firstPosition);
+
+
+                // Notify client for texture update
+                level.sendBlockUpdated(firstPosition, firstEntity.getBlockState(), firstEntity.getBlockState(), Block.UPDATE_ALL);
+                level.sendBlockUpdated(secondPosition, secondEntity.getBlockState(), secondEntity.getBlockState(), Block.UPDATE_ALL);
+
                 player.displayClientMessage(Component.literal(String.format("The board at %s is now quantum-linked to the board at %s.",
                         formatBlockPos(firstPosition), formatBlockPos(secondPosition))), false);
                 return;
