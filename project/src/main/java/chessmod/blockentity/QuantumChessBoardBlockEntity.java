@@ -135,7 +135,7 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
         setLinkedBoardPos(null);
         notifyClientOfBoardChange();
     }
-    
+
     public void linkChessboard(BlockPos linkedPos) {
         setLinkedBoardPos(linkedPos);
         assignLinkState(true);

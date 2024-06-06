@@ -1,6 +1,5 @@
 package chessmod.blockentity;
 
-import chessmod.block.QuantumChessBoardBlock;
 import chessmod.common.dom.model.chess.board.Board;
 import chessmod.common.dom.model.chess.board.BoardFactory;
 import chessmod.common.dom.model.chess.board.SerializedBoard;
@@ -16,9 +15,6 @@ import net.minecraft.world.phys.AABB;
 
 public abstract class ChessboardBlockEntity extends BlockEntity {
 	protected Board board;
-
-
-
 	public void initialize() {
 		this.board = BoardFactory.createBoard();
 	}

@@ -1,21 +1,15 @@
 package chessmod.client.render.blockentity;
 
-import chessmod.block.QuantumChessBoardBlock;
+
 import chessmod.blockentity.QuantumChessBoardBlockEntity;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
 import org.joml.Matrix4f;
 import org.joml.Matrix3f;
-
+import chessmod.client.render.blockentity.QuantumLightBeamRenderer;
 import chessmod.block.ChessboardBlock;
 import chessmod.blockentity.ChessboardBlockEntity;
 import chessmod.blockentity.GoldChessboardBlockEntity;
@@ -34,10 +28,7 @@ public class ChessboardBlockEntityRenderer implements BlockEntityRenderer<Chessb
 	public static final ResourceLocation black = new ResourceLocation("chessmod", "textures/block/black.png");
 	public static final ResourceLocation white = new ResourceLocation("chessmod", "textures/block/white.png");
 
-	private static final ModelResourceLocation NORMAL_MODEL = new ModelResourceLocation(new ResourceLocation("chessmod", "quantum_chessboard"), "");
-	private static final ModelResourceLocation LINKED_MODEL = new ModelResourceLocation(new ResourceLocation("chessmod", "quantum_chessboard_linked"), "");
-	public static final ResourceLocation LINKED_TEXTURE = new ResourceLocation("chessmod", "textures/block/enchantment_glint.png");
-	public static final ResourceLocation NORMAL_TEXTURE = new ResourceLocation("minecraft", "block/emerald_block");
+	private final QuantumLightBeamRenderer beamRenderer = new QuantumLightBeamRenderer();
 
 	public ChessboardBlockEntityRenderer(BlockEntityRendererProvider.Context context) { }
 
@@ -171,6 +162,16 @@ public class ChessboardBlockEntityRenderer implements BlockEntityRenderer<Chessb
          }
 
          pPoseStack.popPose();
+
+		// Check if the block entity is a QuantumChessBoardBlockEntity and is linked
+		if (pBlockEntity instanceof QuantumChessBoardBlockEntity) {
+			QuantumChessBoardBlockEntity qcbe = (QuantumChessBoardBlockEntity) pBlockEntity;
+			if (qcbe.hasLinkedBoard()) { // hasLinkedBaord() is crashing
+				BlockPos startPos = qcbe.getBlockPos();
+				BlockPos endPos = qcbe.getLinkedBoardPos();
+				beamRenderer.renderBeam(startPos, endPos, pPoseStack, pBufferSource, pPackedLight, pPackedOverlay);
+			}
+		}
          
 	}
 

@@ -50,14 +50,6 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
         builder.add(IS_LINKED);
     }
 
-    private boolean is_linked;
-    public boolean is_linked() { return is_linked;}
-
-    public void set_linked(boolean linked) {
-        is_linked = linked;
-        //notifyClientOfBoardChange();  // Notify client of state change but is that necessary?
-    }
-
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state){
