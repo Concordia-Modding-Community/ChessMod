@@ -38,7 +38,7 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
     public synchronized boolean hasLinkedBoard() {
         try {
             if (getLinkedBoardPos() != null && !this.getBlockPos().equals(getLinkedBoardPos())) {
-                System.out.println("checking for a linked board");
+                //System.out.println("checking for a linked board");
                 if ((Objects.requireNonNull(level).getBlockEntity(getLinkedBoardPos())
                         instanceof QuantumChessBoardBlockEntity linkedEntity)) {
                     if(linkedEntity.getLinkedBoardPos() != this.getBlockPos()) {
@@ -58,8 +58,8 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
                     throw new NotALinkedQuantumChessBoardEntityException();
                 }
             } else {
-                System.out.println("checking for a linked board, but not finding one.");
-                System.out.println(getLinkedBoardPos());
+                //System.out.println("checking for a linked board, but not finding one.");
+                //System.out.println(getLinkedBoardPos());
             }
         } catch (NullPointerException | NotALinkedQuantumChessBoardEntityException e) {
             this.linkedBoardPos = null;
