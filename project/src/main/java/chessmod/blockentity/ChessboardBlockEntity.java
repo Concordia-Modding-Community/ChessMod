@@ -34,6 +34,10 @@ public abstract class ChessboardBlockEntity extends BlockEntity {
 		board = b;
 	}
 
+	public String getDimension() {
+		return level.dimension().location().toString();
+	}
+
 	@Override
 	public void onLoad() {
 		super.onLoad();

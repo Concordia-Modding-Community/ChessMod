@@ -59,7 +59,6 @@ public class ChessPlay {
 		public static boolean handle(final ChessPlay message, final Supplier<NetworkEvent.Context> ctx) {
 
 			if (ctx.get().getDirection().getReceptionSide().isServer()) {
-				System.out.println("Attempting a chessplay");
 				ctx.get().enqueueWork(new Runnable() {
 					// Use anon - lambda causes classloading issues
 					@Override
@@ -96,11 +95,11 @@ public class ChessPlay {
 											Elo.updateElo(ctx.get().getSender(), ctx.get().getSender(), true);
 										}
 										if (chessBlockEntity instanceof QuantumChessBoardBlockEntity qcbe) {
-											if(qcbe.getLinkedBoardEntity() == null) {
+											if(qcbe.getLinkedBoard() == null) {
 												Logger.getGlobal().info(ctx.get().getSender().getName().getString() + " played on an unlinked board!");
 											} else {
 												Logger.getGlobal().info(ctx.get().getSender().getName().getString() + " played on an linked board!");
-												qcbe.getLinkedBoardEntity().getBoard().moveSafely(m);
+												qcbe.getLinkedBoard().getBoard().moveSafely(m);
 											}
 										}
 									} else {
@@ -112,8 +111,8 @@ public class ChessPlay {
 
 
 									if (chessBlockEntity instanceof QuantumChessBoardBlockEntity qcbe){
-										qcbe.getLinkedBoardEntity().notifyClientOfBoardChange();
-										qcbe.getLinkedBoardEntity().playSoundForNearbyPlayers(sound);
+										qcbe.getLinkedBoard().notifyClientOfBoardChange();
+										qcbe.getLinkedBoard().playSoundForNearbyPlayers(sound);
 									}
 
 								} catch (InvalidMoveException e) {
