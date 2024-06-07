@@ -2,7 +2,6 @@ package chessmod.common.network;
 
 import java.util.function.Supplier;
 
-import chessmod.blockentity.ChessboardBlockEntity;
 import chessmod.blockentity.WoodChessboardBlockEntity;
 import chessmod.common.dom.model.chess.PieceInitializer;
 import chessmod.common.dom.model.chess.Point;
@@ -11,7 +10,6 @@ import chessmod.common.dom.model.chess.piece.Piece;
 import chessmod.setup.Registration;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
@@ -69,13 +67,13 @@ public class ArbitraryPlacement {
 						
 						if(level.isLoaded(pos)) {
 							BlockEntity blockEntity = level.getBlockEntity(pos);
-							if (blockEntity instanceof WoodChessboardBlockEntity) { //If we want this stuff for other boards, we have to reconsider move format.
-								Board board = ((ChessboardBlockEntity)blockEntity).getBoard();
+							if (blockEntity instanceof WoodChessboardBlockEntity cbe) { //If we want this stuff for other boards, we have to reconsider move format.
+								Board board = cbe.getBoard();
 								Point point = Point.create(message.point);
 								Piece piece = PieceInitializer.create(point, message.piece);
 								board.setPiece(piece, point);
-								((ChessboardBlockEntity)blockEntity).notifyClientOfBoardChange();
-								level.playSound(null, pos, Registration.PLACE_PIECE_SOUND.get(), SoundSource.BLOCKS, 1F, 1F);
+								cbe.notifyClientOfBoardChange();
+								cbe.playSoundForNearbyPlayers(Registration.PLACE_PIECE_SOUND);
 							}
 							
 						}
