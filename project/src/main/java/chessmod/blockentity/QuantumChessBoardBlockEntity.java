@@ -1,13 +1,28 @@
 package chessmod.blockentity;
 
+import chessmod.block.QuantumChessBoardBlock;
 import chessmod.common.dom.model.chess.board.Board;
 import chessmod.common.dom.model.chess.board.SerializedBoard;
 import chessmod.setup.Registration;
+import com.mojang.datafixers.util.Either;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ChunkHolder;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
-import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
     public QuantumChessBoardBlockEntity(BlockPos pWorldPosition, BlockState pBlockState) {
@@ -15,9 +30,50 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
     }
 
     protected BlockPos linkedBoardPos;
+    protected String linkedDimension;
 
     public void setLinkedBoardPos(BlockPos pos) {
+        setLinkedBoardPos(pos, level.dimension().location().toString());
+    }
+
+
+    public static ServerLevel getServerLevel(String dimensionLocationString) {
+        ResourceLocation dimensionLocation = new ResourceLocation(dimensionLocationString);
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        ResourceKey<Level> dimensionKey = ResourceKey.create(Registries.DIMENSION, dimensionLocation);
+        return server.getLevel(dimensionKey);
+    }
+
+    public static BlockEntity getBlockEntityInDimension(String dimensionLocationString, BlockPos blockPos) {
+        ServerLevel targetLevel = getServerLevel(dimensionLocationString);
+        System.out.println("targetLevel: " + targetLevel);
+        System.out.println("blockPos: " + blockPos);
+        if (targetLevel != null && blockPos != null) {
+            // Load the chunk containing the block position
+            ChunkPos chunkPos = new ChunkPos(blockPos);
+
+            CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>> futureChunk = targetLevel.getChunkSource().getChunkFuture(chunkPos.x, chunkPos.z, ChunkStatus.FULL, true);
+
+            try {
+                Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure> chunk = futureChunk.get();
+                System.out.println("No, we got in here!");
+                return targetLevel.getBlockEntity(blockPos);
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println("No, we got in here!");
+        return null;
+    }
+
+    public void setLinkedBoardPos(BlockPos pos, String dimension) {
+        System.out.println("Setting linked board pos to " + pos);
+
         this.linkedBoardPos = pos;
+        System.out.println("TWITCH STREAM!!! " + dimension);
+        this.linkedDimension = dimension;
+        System.out.println("TWITCH This Chessboard!!! " + getBlockEntityInDimension(linkedDimension, linkedBoardPos));
+        this.setChanged();
     }
 
     public void quantumImprint(QuantumChessBoardBlockEntity otherBoard) {
@@ -35,34 +91,25 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
      * @return true if there is a linked QuantumChessBoardBlockEntity, false otherwise
      */
     public synchronized boolean hasLinkedBoard() {
-        try {
-            if (getLinkedBoardPos() != null && !this.getBlockPos().equals(getLinkedBoardPos())) {
-                System.out.println("checking for a linked board");
-                if ((Objects.requireNonNull(level).getBlockEntity(getLinkedBoardPos())
-                        instanceof QuantumChessBoardBlockEntity linkedEntity)) {
-                    if(linkedEntity.getLinkedBoardPos() != this.getBlockPos()) {
-                        return true;
-                    } else {
-                        /*
-                         * Until we're happily certain that boards can't be unlinked badly, we need to make sure any
-                         * problematic stuff is taken care of.
-                         *
-                         * In theory, we could clean everything, but since every board should be checking itself and
-                         * this is called inside a synchronized method, let's just clean our immediate selves.
-                         */
-                        this.linkedBoardPos = null;
-                        notifyClientOfBoardChange();
-                    }
-                } else {
-                    throw new NotALinkedQuantumChessBoardEntityException();
-                }
+        if (getLinkedBoard() != null && !(this.getBlockPos().equals(getLinkedBoardPos()) && level.dimension().location().toString().equals(linkedDimension))) {
+            System.out.println("checking for a linked board");
+            if(getLinkedBoard().getLinkedBoardPos() != this.getBlockPos()) {
+                return true;
             } else {
-                System.out.println("checking for a linked board, but not finding one.");
-                System.out.println(getLinkedBoardPos());
+                /*
+                 * Until we're happily certain that boards can't be unlinked badly, we need to make sure any
+                 * problematic stuff is taken care of.
+                 *
+                 * In theory, we could clean everything, but since every board should be checking itself and
+                 * this is called inside a synchronized method, let's just clean our immediate selves.
+                 */
+                //Too bad this solution messes stuff up...
+                //this.linkedBoardPos = null;
+                notifyClientOfBoardChange();
             }
-        } catch (NullPointerException | NotALinkedQuantumChessBoardEntityException e) {
-            this.linkedBoardPos = null;
-            notifyClientOfBoardChange();
+        } else {
+            System.out.println("checking for a linked board, but not finding one.");
+            System.out.println(getLinkedBoardPos());
         }
         return false;
     }
@@ -70,7 +117,7 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
     public QuantumChessBoardBlockEntity getLinkedBoardEntity() {
         if (hasLinkedBoard()) {
             // Retrieve the QuantumChessBoardBlockEntity from the linked position
-            if(Objects.requireNonNull(level).getBlockEntity(getLinkedBoardPos()) instanceof QuantumChessBoardBlockEntity linkedEntity){
+            if(getBlockEntityInDimension(linkedDimension, linkedBoardPos) instanceof QuantumChessBoardBlockEntity linkedEntity) {
                 return linkedEntity;
             }
         }
@@ -86,6 +133,7 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
         super.saveAdditional(pTag);
         if(getLinkedBoardPos() != null) {
             pTag.putIntArray("linkedBoardPos", new int[]{getLinkedBoardPos().getX(), getLinkedBoardPos().getY(), getLinkedBoardPos().getZ()});
+            pTag.putString("linkedDimension", linkedDimension);
         }
     }
     @Override
@@ -97,14 +145,25 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
         super.load(pTag);
         int[] lbp = pTag.getIntArray("linkedBoardPos");
         if(lbp.length != 3) {
+           System.out.println("Nuking linkedBoardPos");
            linkedBoardPos = null;
         } else {
             linkedBoardPos = new BlockPos(lbp[0], lbp[1], lbp[2]);
+            linkedDimension = pTag.getString("linkedDimension");
         }
     }
 
     public BlockPos getLinkedBoardPos() {
         return linkedBoardPos;
+    }
+
+    public QuantumChessBoardBlockEntity getLinkedBoard() {
+        if(linkedBoardPos == null) return null;
+        BlockEntity be = getBlockEntityInDimension(linkedDimension, linkedBoardPos);
+        if(be instanceof QuantumChessBoardBlockEntity qcbe) {
+            return qcbe;
+        }
+        return null;
     }
 
     public static class FailureToLinkQuantumChessBoardEntityException extends Throwable {
@@ -115,14 +174,10 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
     public static class NotALinkedQuantumChessBoardEntityException extends Throwable {
     }
 
-    @Override
-    public void setRemoved() {
-        super.setRemoved();
-        unlinkChessboard();
-    }
-
     /**
      * This unlinks a board by setting its
+     *
+     * TODO: We're leaving the linkedDimension. This will only lead to suffering, fix it eventually.
      */
     public void unlinkChessboard() {
         if(hasLinkedBoard()) {
