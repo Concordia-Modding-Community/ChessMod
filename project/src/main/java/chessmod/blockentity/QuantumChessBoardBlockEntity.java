@@ -1,12 +1,16 @@
 package chessmod.blockentity;
 
+import chessmod.block.QuantumChessBoardBlock;
 import chessmod.common.dom.model.chess.board.Board;
 import chessmod.common.dom.model.chess.board.SerializedBoard;
 import chessmod.setup.Registration;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.logging.Logger;
 
 public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
     public QuantumChessBoardBlockEntity(BlockPos pWorldPosition, BlockState pBlockState) {
@@ -27,14 +31,20 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
      */
     public synchronized boolean hasLinkedBoard() {
         try {//The try/catch is just to avoid any weirdness relating to the complex
-             //logic of chunkloading/finding entities in getBlockEntityInDimension
+             //logic of chunk-loading/finding entities in getBlockEntityInDimension
              //I have no evidence that this goes sideways, but I'd hate to crash
              //someone's server because of a dumb NPE that may happen on some versions
              //of MC and not others.
             return linkedBoardPos != null &&
                     Utility.getBlockEntityInDimension(linkedDimension, linkedBoardPos) instanceof QuantumChessBoardBlockEntity;
         } catch (Exception e) {
-            e.printStackTrace();
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            String stackTrace = sw.toString();
+            Logger.getGlobal().info("We didn't expected hasLinkedBoard to have trouble, but it did");
+            Logger.getGlobal().info(stackTrace);
+
             return false;
         }
     }
@@ -49,7 +59,12 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
             }
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            String stackTrace = sw.toString();
+            Logger.getGlobal().info("We didn't expected getLinkedBoard to have trouble, but it did");
+            Logger.getGlobal().info(stackTrace);
             return null;
         }
     }
@@ -81,7 +96,7 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
         super.load(pTag);
         int[] lbp = pTag.getIntArray("linkedBoardPos");
         if(lbp.length != 3) {
-           linkedBoardPos = null;
+            linkedBoardPos = null;
         } else {
             linkedBoardPos = new BlockPos(lbp[0], lbp[1], lbp[2]);
             linkedDimension = pTag.getString("linkedDimension");
@@ -93,7 +108,6 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
             super(s);
         }
     }
-
     public void linkChessBoards(QuantumChessBoardBlockEntity second) {
         //Make sure the old boards are unlinked
         unlinkChessboards();
@@ -101,8 +115,10 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
         // use quantumImprint to clone the board state before linking
         quantumImprint(second);
         setLinkedBoard(second.getBlockPos(), second.getDimension());
+        assignLinkState(true);
         notifyClientOfBoardChange();
         second.setLinkedBoard(getBlockPos(), getDimension());
+        second.assignLinkState(true);
         second.notifyClientOfBoardChange();
     }
 
@@ -112,9 +128,28 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
     public void unlinkChessboards() {
         if(hasLinkedBoard()) {
             getLinkedBoard().setLinkedBoard(null, null);
+            getLinkedBoard().assignLinkState(false);
             getLinkedBoard().notifyClientOfBoardChange();
         }
         setLinkedBoard(null, null);
+        assignLinkState(false);
         notifyClientOfBoardChange();
+    }
+
+    private void assignLinkState(boolean linked) {
+        try {
+            if(level==null) throw new NullPointerException("level wasn't supposed to return null!");
+            BlockState bs = level.getBlockState(this.getBlockPos());
+            bs = bs.setValue(QuantumChessBoardBlock.IS_LINKED, linked);
+            //BlockFlags.BLOCK_UPDATE = 2
+            //BlockFlags.FORCE_STATE = 32
+            level.setBlock(this.getBlockPos(), bs, 34);
+        } catch (NullPointerException e) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            String stackTrace = sw.toString();
+            Logger.getGlobal().info(stackTrace);
+        }
     }
 }

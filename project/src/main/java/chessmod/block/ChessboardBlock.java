@@ -1,5 +1,6 @@
 package chessmod.block;
 
+
 import chessmod.blockentity.ChessboardBlockEntity;
 import chessmod.setup.Registration;
 import net.minecraft.core.BlockPos;
@@ -24,13 +25,20 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+
 public abstract class ChessboardBlock extends GlassBlock implements EntityBlock {
 	public static final DirectionProperty FACING = BlockStateProperties.FACING;
 	public ChessboardBlock() {
 		super(BlockBehaviour.Properties.of().noOcclusion());
-		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
+		doRegisterDefaultState();
+
 	}
 
+	public void doRegisterDefaultState() {
+		this.registerDefaultState(this.stateDefinition.any()
+				.setValue(FACING, Direction.NORTH));
+	}
+	 
 	@Override
 	public VoxelShape getVisualShape(BlockState state, BlockGetter level, net.minecraft.core.BlockPos pos, CollisionContext context) {
 		VoxelShape BOARD = Block.box(0.0D, 12.0D, 0.0D, 16.0D, 16.0D, 16.0D);

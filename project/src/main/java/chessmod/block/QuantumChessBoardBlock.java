@@ -8,6 +8,7 @@ import chessmod.blockentity.Utility;
 import chessmod.client.gui.entity.GoldChessboardGui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -15,17 +16,36 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 
 public class QuantumChessBoardBlock extends GoldChessboardBlock {
-    public QuantumChessBoardBlock(){
-        super();
+    public static final BooleanProperty IS_LINKED = BooleanProperty.create("is_linked");
+
+    public void doRegisterDefaultState() {
+        this.registerDefaultState(this.stateDefinition.any()
+                .setValue(FACING, Direction.NORTH)
+                .setValue(IS_LINKED, false));
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return super.getStateForPlacement(context).setValue(IS_LINKED, false);
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
+        builder.add(IS_LINKED);
     }
 
     @Nullable
@@ -46,6 +66,11 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult pHit) {
 
         ItemStack heldItem = player.getMainHandItem();
+
+        if(!heldItem.is(Items.ENDER_PEARL)) {
+            return super.use(state, level, pos, player, hand, pHit);
+        }
+
         if (!level.isClientSide && heldItem.is(Items.ENDER_PEARL)) {
             try {
                 CompoundTag nbtData = heldItem.getOrCreateTag();

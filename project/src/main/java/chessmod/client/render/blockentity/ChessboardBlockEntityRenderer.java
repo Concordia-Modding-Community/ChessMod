@@ -1,10 +1,18 @@
 package chessmod.client.render.blockentity;
 
+import chessmod.block.QuantumChessBoardBlock;
 import chessmod.blockentity.QuantumChessBoardBlockEntity;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix4f;
 import org.joml.Matrix3f;
 
@@ -26,9 +34,12 @@ public class ChessboardBlockEntityRenderer implements BlockEntityRenderer<Chessb
 	public static final ResourceLocation black = new ResourceLocation("chessmod", "textures/block/black.png");
 	public static final ResourceLocation white = new ResourceLocation("chessmod", "textures/block/white.png");
 
-    public ChessboardBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
+	private static final ModelResourceLocation NORMAL_MODEL = new ModelResourceLocation(new ResourceLocation("chessmod", "quantum_chessboard"), "");
+	private static final ModelResourceLocation LINKED_MODEL = new ModelResourceLocation(new ResourceLocation("chessmod", "quantum_chessboard_linked"), "");
+	public static final ResourceLocation LINKED_TEXTURE = new ResourceLocation("chessmod", "textures/block/enchantment_glint.png");
+	public static final ResourceLocation NORMAL_TEXTURE = new ResourceLocation("minecraft", "block/emerald_block");
 
-    }
+	public ChessboardBlockEntityRenderer(BlockEntityRendererProvider.Context context) { }
 
 	public void draw2DRect(VertexConsumer  bufferbuilder, PoseStack pPoseStack, Point2f p1, Point2f p2, float r, float g, float b, float a, int pPackedLight, int pPackedOverlay) {
 		Matrix4f model = pPoseStack.last().pose() ;
@@ -185,8 +196,7 @@ public class ChessboardBlockEntityRenderer implements BlockEntityRenderer<Chessb
 	        }
         }
 	}
-	
-	
+
 	private void drawBishop(int bx, int bz, PoseStack pPoseStack, VertexConsumer  bufferbuilder, int pPackedLight, int pPackedOverlay) {
 		drawPiece(0.02f, bx, bz, pPoseStack, bufferbuilder, pPackedLight, pPackedOverlay, 0, 0, 0);        
 		drawPiece(0.02f, bx, bz, pPoseStack, bufferbuilder, pPackedLight, pPackedOverlay, 0, 0.04, 0);
@@ -270,6 +280,4 @@ public class ChessboardBlockEntityRenderer implements BlockEntityRenderer<Chessb
            
 	}
 
-
-	
 }

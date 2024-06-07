@@ -1,5 +1,6 @@
 package chessmod.blockentity;
 
+import chessmod.block.QuantumChessBoardBlock;
 import chessmod.common.dom.model.chess.board.Board;
 import chessmod.common.dom.model.chess.board.BoardFactory;
 import chessmod.common.dom.model.chess.board.SerializedBoard;
@@ -22,6 +23,8 @@ import java.util.function.Supplier;
 public abstract class ChessboardBlockEntity extends BlockEntity {
 	protected Board board;
 
+
+
 	public void initialize() {
 		this.board = BoardFactory.createBoard();
 	}
@@ -43,7 +46,6 @@ public abstract class ChessboardBlockEntity extends BlockEntity {
 		super.onLoad();
 	}
 
-	
 	@Override
 	public AABB getRenderBoundingBox() {
 		// This, combined with isGlobalRenderer in the BlockEntityRenderer makes it so that the
@@ -56,7 +58,6 @@ public abstract class ChessboardBlockEntity extends BlockEntity {
 		super(blockEntityTypeIn, pWorldPosition, pBlockState);
 		initialize();
 	}
-	
 
 	@Override
 	protected void saveAdditional(CompoundTag pTag) {
@@ -73,8 +74,11 @@ public abstract class ChessboardBlockEntity extends BlockEntity {
 		long pieceMask = pTag.getLong("piece_mask");
 		long[] pieces = pTag.getLongArray("pieces");
 		long[] moves = pTag.getLongArray("moves");
-		if(pieceMask == 0 && pieces.length ==0) board = BoardFactory.createBoard();
-		else board = new SerializedBoard(pieceMask, pieces, moves).deSerialize();
+		if (pieceMask == 0 && pieces.length == 0) {
+			board = BoardFactory.createBoard();
+		} else {
+			board = new SerializedBoard(pieceMask, pieces, moves).deSerialize();
+		}
 	}
 	
 	

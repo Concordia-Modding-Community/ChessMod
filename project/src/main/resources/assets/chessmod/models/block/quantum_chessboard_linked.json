@@ -3,7 +3,7 @@
   "textures": {
     "particle": "minecraft:block/emerald_block",
     "texture": "chessmod:block/chessboardtop",
-    "stand": "minecraft:block/emerald_block"
+    "stand": "chessmod:block/enchantment_glint"
   },
   "elements": [
     {
