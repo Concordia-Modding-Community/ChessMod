@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -15,47 +16,48 @@ public class QuantumLightBeamRenderer {
     private static final ResourceLocation BEAM_TEXTURE = new ResourceLocation("chessmod", "textures/entity/beam_texture.png");
 
     public void renderBeam(BlockPos startPos, BlockPos endPos, PoseStack pPoseStack, MultiBufferSource pBufferSource, int pPackedLight, int pPackedOverlay) {
-        // Convert block positions to Vector3f
-        Vector3f start = new Vector3f((float) startPos.getX() + 0.5f, (float) startPos.getY() + 0.5f, (float) startPos.getZ() + 0.5f);
-        Vector3f end = new Vector3f((float) endPos.getX() + 0.5f, (float) endPos.getY() + 0.5f, (float) endPos.getZ() + 0.5f);
+        Vec3 start = new Vec3(startPos.getX() + 0.5, startPos.getY() + 0.5, startPos.getZ() + 0.5);
+        Vec3 end = new Vec3(endPos.getX() + 0.5, endPos.getY() + 0.5, endPos.getZ() + 0.5);
 
-        // Bind the texture
-        RenderSystem.setShaderTexture(0, BEAM_TEXTURE);
+        Vec3 direction = end.subtract(start).normalize();
+        Vec3 up = new Vec3(0, 1, 0);
+        Vec3 right = direction.cross(up).normalize().scale(0.1f);
 
-        // Set up the render type
-        VertexConsumer buffer = pBufferSource.getBuffer(RenderType.entityCutout(BEAM_TEXTURE));
-
-        // Set up the matrix for rendering
+        VertexConsumer buffer = pBufferSource.getBuffer(RenderType.beaconBeam(BEAM_TEXTURE, false));
         Matrix4f matrix = pPoseStack.last().pose();
         Matrix3f normalMatrix = pPoseStack.last().normal();
 
-        // Calculate direction vector from start to end
-        Vector3f direction = new Vector3f(end).sub(start).normalize();
+        float[] color = {1.0f, 1.0f, 1.0f}; //  color for the beam
+        float alpha = 0.5f; // Beam transparency
 
-        // Define the beam width
-        float beamWidth = 0.1f;
-
-        // Calculate a perpendicular vector to the direction
-        Vector3f perpendicular = new Vector3f(direction).cross(new Vector3f(0, 1, 0)).normalize().mul(beamWidth);
-
-        // Calculate the normal vector for the beam (cross product of direction and perpendicular)
-        Vector3f normal = new Vector3f(direction).cross(perpendicular).normalize();
-
-        // Draw the beam with correct normals
-        buffer.vertex(matrix, start.x() + perpendicular.x(), start.y() + perpendicular.y(), start.z() + perpendicular.z())
-                .color(1.0f, 1.0f, 1.0f, 1.0f)
+        // render  beam as a quad strip with normals
+        buffer.vertex(matrix, (float) (start.x + right.x), (float) (start.y + right.y), (float) (start.z + right.z))
+                .color(color[0], color[1], color[2], alpha)
                 .uv(0.0f, 0.0f)
                 .overlayCoords(pPackedOverlay)
                 .uv2(pPackedLight)
-                .normal(normalMatrix, normal.x(), normal.y(), normal.z())
+                .normal(normalMatrix, (float) right.x(), (float) right.y(), (float) right.z())
                 .endVertex();
-
-        buffer.vertex(matrix, end.x() + perpendicular.x(), end.y() + perpendicular.y(), end.z() + perpendicular.z())
-                .color(1.0f, 1.0f, 1.0f, 1.0f)
+        buffer.vertex(matrix, (float) (end.x + right.x), (float) (end.y + right.y), (float) (end.z + right.z))
+                .color(color[0], color[1], color[2], alpha)
                 .uv(1.0f, 0.0f)
                 .overlayCoords(pPackedOverlay)
                 .uv2(pPackedLight)
-                .normal(normalMatrix, normal.x(), normal.y(), normal.z())
+                .normal(normalMatrix, (float) right.x(), (float) right.y(), (float) right.z())
+                .endVertex();
+        buffer.vertex(matrix, (float) (start.x - right.x), (float) (start.y - right.y), (float) (start.z - right.z))
+                .color(color[0], color[1], color[2], alpha)
+                .uv(0.0f, 1.0f)
+                .overlayCoords(pPackedOverlay)
+                .uv2(pPackedLight)
+                .normal(normalMatrix, (float) -right.x(), (float) -right.y(), (float) -right.z())
+                .endVertex();
+        buffer.vertex(matrix, (float) (end.x - right.x), (float) (end.y - right.y), (float) (end.z - right.z))
+                .color(color[0], color[1], color[2], alpha)
+                .uv(1.0f, 1.0f)
+                .overlayCoords(pPackedOverlay)
+                .uv2(pPackedLight)
+                .normal(normalMatrix, (float) -right.x(), (float) -right.y(), (float) -right.z())
                 .endVertex();
     }
 }
