@@ -58,8 +58,7 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
                     throw new NotALinkedQuantumChessBoardEntityException();
                 }
             } else {
-                //System.out.println("checking for a linked board, but not finding one.");
-                //System.out.println(getLinkedBoardPos());
+
             }
         } catch (NullPointerException | NotALinkedQuantumChessBoardEntityException e) {
             this.linkedBoardPos = null;
