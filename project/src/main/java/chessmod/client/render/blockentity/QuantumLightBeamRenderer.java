@@ -45,14 +45,16 @@ public class QuantumLightBeamRenderer {
                 .uv(0.0f, 1.0f)
                 .overlayCoords(overlay)
                 .uv2(light)
-                .normal(normalMatrix, 0, 1, 0)  // testing
+                //.normal(normalMatrix, 0, 1, 0)  // testing
+                .normal(normalMatrix, (float) -right.x(), (float) -right.y(), (float) -right.z())
                 .endVertex();
         buffer.vertex(matrix, (float) (start.x + right.x), (float) (start.y + right.y), (float) (start.z + right.z))
                 .color(color[0], color[1], color[2], alpha)
                 .uv(0.0f, 0.0f)
                 .overlayCoords(overlay)
                 .uv2(light)
-                .normal(normalMatrix, 0, 1, 0)
+                //.normal(normalMatrix, 1, 1, 0)
+                .normal(normalMatrix, (float) right.x(), (float) right.y(), (float) right.z())
                 .endVertex();
 
         buffer.vertex(matrix, (float) (end.x - right.x), (float) (end.y - right.y), (float) (end.z - right.z))
@@ -60,14 +62,17 @@ public class QuantumLightBeamRenderer {
                 .uv(1.0f, 1.0f)
                 .overlayCoords(overlay)
                 .uv2(light)
-                .normal(normalMatrix, 0, 1, 0)
+                //.normal(normalMatrix, (float) right.x(), (float) right.y(), (float) right.z())
+                .normal(normalMatrix, (float) -right.x(), (float) -right.y(), (float) -right.z())
+                //.normal(normalMatrix, 1, 0, 1)
                 .endVertex();
         buffer.vertex(matrix, (float) (end.x + right.x), (float) (end.y + right.y), (float) (end.z + right.z))
                 .color(color[0], color[1], color[2], alpha)
                 .uv(1.0f, 0.0f)
                 .overlayCoords(overlay)
                 .uv2(light)
-                .normal(normalMatrix, 0, 1, 0)
+                .normal(normalMatrix, (float) right.x(), (float) right.y(), (float) right.z())
+                //.normal(normalMatrix, 0, 1, 0)
                 .endVertex();
     }
 }
