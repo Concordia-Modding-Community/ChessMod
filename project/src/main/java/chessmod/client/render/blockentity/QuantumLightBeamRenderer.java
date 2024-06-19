@@ -21,7 +21,7 @@ public class QuantumLightBeamRenderer {
 
         Vec3 direction = end.subtract(start).normalize();
         Vec3 up = new Vec3(0, 1, 0);
-        Vec3 right = direction.cross(up).normalize().scale(0.2f); // Adjust scale for beam width
+        Vec3 right = direction.cross(up).normalize().scale(0.2f); // scale for beam width
 
         VertexConsumer buffer = pBufferSource.getBuffer(RenderType.beaconBeam(BEAM_TEXTURE, false));
         Matrix4f matrix = pPoseStack.last().pose();
@@ -35,8 +35,7 @@ public class QuantumLightBeamRenderer {
         System.out.println("Direction: " + direction);
         System.out.println("Right: " + right);
 
-
-        // Render the beam as a quad
+        // render the beam as a quad
         renderBeamQuad(buffer, matrix, normalMatrix, start, end, right, color, alpha, pPackedLight, pPackedOverlay);
     }
 
@@ -46,14 +45,14 @@ public class QuantumLightBeamRenderer {
                 .uv(0.0f, 1.0f)
                 .overlayCoords(overlay)
                 .uv2(light)
-                .normal(normalMatrix, (float) right.x(), (float) right.y(), (float) right.z())
+                .normal(normalMatrix, 0, 1, 0)  // testing
                 .endVertex();
         buffer.vertex(matrix, (float) (start.x + right.x), (float) (start.y + right.y), (float) (start.z + right.z))
                 .color(color[0], color[1], color[2], alpha)
                 .uv(0.0f, 0.0f)
                 .overlayCoords(overlay)
                 .uv2(light)
-                .normal(normalMatrix, (float) right.x(), (float) right.y(), (float) right.z())
+                .normal(normalMatrix, 0, 1, 0)
                 .endVertex();
 
         buffer.vertex(matrix, (float) (end.x - right.x), (float) (end.y - right.y), (float) (end.z - right.z))
@@ -61,14 +60,14 @@ public class QuantumLightBeamRenderer {
                 .uv(1.0f, 1.0f)
                 .overlayCoords(overlay)
                 .uv2(light)
-                .normal(normalMatrix, (float) right.x(), (float) right.y(), (float) right.z())
+                .normal(normalMatrix, 0, 1, 0)
                 .endVertex();
         buffer.vertex(matrix, (float) (end.x + right.x), (float) (end.y + right.y), (float) (end.z + right.z))
                 .color(color[0], color[1], color[2], alpha)
                 .uv(1.0f, 0.0f)
                 .overlayCoords(overlay)
                 .uv2(light)
-                .normal(normalMatrix, (float) right.x(), (float) right.y(), (float) right.z())
+                .normal(normalMatrix, 0, 1, 0)
                 .endVertex();
     }
 }

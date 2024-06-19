@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
@@ -39,8 +40,26 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
              //I have no evidence that this goes sideways, but I'd hate to crash
              //someone's server because of a dumb NPE that may happen on some versions
              //of MC and not others.
-            return linkedBoardPos != null &&
-                    Utility.getBlockEntityInDimension(linkedDimension, linkedBoardPos) instanceof QuantumChessBoardBlockEntity;
+            if (getLinkedBoardPos() != null && !this.getBlockPos().equals(getLinkedBoardPos())) {
+                if ((Objects.requireNonNull(level).getBlockEntity(getLinkedBoardPos())
+                        instanceof QuantumChessBoardBlockEntity linkedEntity)) {
+                    if(linkedEntity.getLinkedBoardPos() != this.getBlockPos()) {
+                        return true;
+                    }
+                }
+                return linkedBoardPos != null &&
+                        Utility.getBlockEntityInDimension(linkedDimension, linkedBoardPos) instanceof QuantumChessBoardBlockEntity;
+            } else{
+                /*
+                 * Until we're happily certain that boards can't be unlinked badly, we need to make sure any
+                 * problematic stuff is taken care of.
+                 *
+                 * In theory, we could clean everything, but since every board should be checking itself and
+                 * this is called inside a synchronized method, let's just clean our immediate selves.
+                 */
+                this.linkedBoardPos = null;
+                notifyClientOfBoardChange();
+            }
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -49,11 +68,12 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
             Logger.getGlobal().info("We didn't expected hasLinkedBoard to have trouble, but it did");
             Logger.getGlobal().info(stackTrace);
 
-            return false;
+
         }
+        return false;
     }
 
-    public QuantumChessBoardBlockEntity getLinkedBoard() {
+    public QuantumChessBoardBlockEntity getLinkedBoardEntity() {
         try {
             if (hasLinkedBoard()) {
                 // Retrieve the QuantumChessBoardBlockEntity from the linked dimension/position
@@ -131,9 +151,9 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
      */
     public void unlinkChessboards() {
         if(hasLinkedBoard()) {
-            getLinkedBoard().setLinkedBoard(null, null);
-            getLinkedBoard().assignLinkState(false);
-            getLinkedBoard().notifyClientOfBoardChange();
+            getLinkedBoardEntity().setLinkedBoard(null, null);
+            getLinkedBoardEntity().assignLinkState(false);
+            getLinkedBoardEntity().notifyClientOfBoardChange();
         }
         setLinkedBoard(null, null);
         assignLinkState(false);
