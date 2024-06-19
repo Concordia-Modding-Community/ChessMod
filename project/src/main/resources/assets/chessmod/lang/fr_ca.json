@@ -8,6 +8,11 @@
   "chessmod.subtitle.place_piece": "Pièce d'échecs placée",
   "chessmod.subtitle.place_piece_take": "Pièce d'échecs placée contre pièce",
 
+  "chessmod.quantum.first_notification": "Premier échiquier sélectionné à (x:%d, y:%d, z:%d, dim:%s)",
+  "chessmod.quantum.second_notification": "L'échiquier à (x:%d, y:%d, z:%d, dim:%s) est maintenant lié quantiquement à l'échiquier à (x:%d, y:%d, z:%d, dim:%s)",
+  "chessmod.quantum.unmatched_board_notification": "Les deux échiquiers liés doivent être des Échiquiers Quantiques.",
+  "chessmod.quantum.circular_linkage_notification": "Impossible de lier à l'échiquier d'origine.",
+
   "block.chessmod.wood_chessboard": "Un échiquier en bois",
   "block.chessmod.gold_chessboard": "Un échiquier en or",
   "block.chessmod.chesses_chessboard": "Un échiquier pour Chesses",
