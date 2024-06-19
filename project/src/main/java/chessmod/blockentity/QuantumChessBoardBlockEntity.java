@@ -25,6 +25,10 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
         this.linkedDimension = dimension;
         this.setChanged();
     }
+    public BlockPos getLinkedBoardPos() {
+        return linkedBoardPos;
+    }
+
 
     /**
      * @return true if there is a linked QuantumChessBoardBlockEntity, false otherwise
