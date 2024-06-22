@@ -173,10 +173,12 @@ public class ChessboardBlockEntityRenderer implements BlockEntityRenderer<Chessb
 		pPoseStack.pushPose();
 		if (pBlockEntity instanceof QuantumChessBoardBlockEntity) {
 			QuantumChessBoardBlockEntity qcbe = (QuantumChessBoardBlockEntity) pBlockEntity;
-			if (qcbe.hasLinkedBoard()) {
+			if (qcbe.getBlockState().hasProperty(QuantumChessBoardBlock.IS_LINKED)) {
 				BlockPos startPos = qcbe.getBlockPos();
 				BlockPos endPos = qcbe.getLinkedBoardPos();
-				beamRenderer.renderBeam(startPos, endPos, pPoseStack, pBufferSource, pPackedLight, pPackedOverlay);
+				if (endPos != null) {
+					beamRenderer.renderBeam(startPos, endPos, pPoseStack, pBufferSource, pPackedLight, pPackedOverlay);
+				}
 			}
 		}
 		pPoseStack.popPose();
