@@ -38,6 +38,8 @@ public class QuantumLightBeamRenderer {
 
     private void renderBeamQuad(VertexConsumer buffer, Matrix4f matrix, Matrix3f normalMatrix, Vec3 start, Vec3 end, float[] color, int light, int overlay) {
 
+       light = (15 << 20) | (15 << 4);
+
         //We should be able to change the beam dimensions here instead of farting around with vertices
         //Texture should be a tileable square, and its width should be texturewidth for this to work
         //note that a "block" in minecraft is 64 wide, so that's what we're workign from for a few things
