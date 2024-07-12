@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
@@ -25,6 +26,10 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
         this.linkedDimension = dimension;
         this.setChanged();
     }
+    public BlockPos getLinkedBoardPos() {
+        return linkedBoardPos;
+    }
+
 
     /**
      * @return true if there is a linked QuantumChessBoardBlockEntity, false otherwise
@@ -35,8 +40,11 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
              //I have no evidence that this goes sideways, but I'd hate to crash
              //someone's server because of a dumb NPE that may happen on some versions
              //of MC and not others.
-            return linkedBoardPos != null &&
-                    Utility.getBlockEntityInDimension(linkedDimension, linkedBoardPos) instanceof QuantumChessBoardBlockEntity;
+
+                return linkedBoardPos != null &&
+                        Utility.getBlockEntityInDimension(linkedDimension, linkedBoardPos) instanceof QuantumChessBoardBlockEntity;
+
+
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -45,11 +53,12 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
             Logger.getGlobal().info("We didn't expected hasLinkedBoard to have trouble, but it did");
             Logger.getGlobal().info(stackTrace);
 
-            return false;
+
         }
+        return false;
     }
 
-    public QuantumChessBoardBlockEntity getLinkedBoard() {
+    public QuantumChessBoardBlockEntity getLinkedBoardEntity() {
         try {
             if (hasLinkedBoard()) {
                 // Retrieve the QuantumChessBoardBlockEntity from the linked dimension/position
@@ -127,9 +136,9 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
      */
     public void unlinkChessboards() {
         if(hasLinkedBoard()) {
-            getLinkedBoard().setLinkedBoard(null, null);
-            getLinkedBoard().assignLinkState(false);
-            getLinkedBoard().notifyClientOfBoardChange();
+            getLinkedBoardEntity().setLinkedBoard(null, null);
+            getLinkedBoardEntity().assignLinkState(false);
+            getLinkedBoardEntity().notifyClientOfBoardChange();
         }
         setLinkedBoard(null, null);
         assignLinkState(false);

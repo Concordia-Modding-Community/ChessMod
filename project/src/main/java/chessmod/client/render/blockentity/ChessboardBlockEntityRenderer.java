@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix4f;
 import org.joml.Matrix3f;
@@ -34,10 +35,7 @@ public class ChessboardBlockEntityRenderer implements BlockEntityRenderer<Chessb
 	public static final ResourceLocation black = new ResourceLocation("chessmod", "textures/block/black.png");
 	public static final ResourceLocation white = new ResourceLocation("chessmod", "textures/block/white.png");
 
-	private static final ModelResourceLocation NORMAL_MODEL = new ModelResourceLocation(new ResourceLocation("chessmod", "quantum_chessboard"), "");
-	private static final ModelResourceLocation LINKED_MODEL = new ModelResourceLocation(new ResourceLocation("chessmod", "quantum_chessboard_linked"), "");
-	public static final ResourceLocation LINKED_TEXTURE = new ResourceLocation("chessmod", "textures/block/enchantment_glint.png");
-	public static final ResourceLocation NORMAL_TEXTURE = new ResourceLocation("minecraft", "block/emerald_block");
+	private final QuantumLightBeamRenderer beamRenderer = new QuantumLightBeamRenderer();
 
 	public ChessboardBlockEntityRenderer(BlockEntityRendererProvider.Context context) { }
 
@@ -171,6 +169,19 @@ public class ChessboardBlockEntityRenderer implements BlockEntityRenderer<Chessb
          }
 
          pPoseStack.popPose();
+
+		pPoseStack.pushPose();
+		if (pBlockEntity instanceof QuantumChessBoardBlockEntity) {
+			QuantumChessBoardBlockEntity qcbe = (QuantumChessBoardBlockEntity) pBlockEntity;
+			if (qcbe.getBlockState().hasProperty(QuantumChessBoardBlock.IS_LINKED)) {
+				BlockPos startPos = qcbe.getBlockPos();
+				BlockPos endPos = qcbe.getLinkedBoardPos();
+				if (endPos != null) {
+					beamRenderer.renderBeam(startPos, endPos, pPoseStack, pBufferSource, pPackedLight, pPackedOverlay);
+				}
+			}
+		}
+		pPoseStack.popPose();
          
 	}
 

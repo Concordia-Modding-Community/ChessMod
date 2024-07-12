@@ -95,11 +95,11 @@ public class ChessPlay {
 											Elo.updateElo(ctx.get().getSender(), ctx.get().getSender(), true);
 										}
 										if (chessBlockEntity instanceof QuantumChessBoardBlockEntity qcbe) {
-											if(qcbe.getLinkedBoard() == null) {
+											if(qcbe.getLinkedBoardEntity() == null) {
 												Logger.getGlobal().info(ctx.get().getSender().getName().getString() + " played on an unlinked board!");
 											} else {
 												Logger.getGlobal().info(ctx.get().getSender().getName().getString() + " played on an linked board!");
-												qcbe.getLinkedBoard().getBoard().moveSafely(m);
+												qcbe.getLinkedBoardEntity().getBoard().moveSafely(m);
 											}
 										}
 									} else {
@@ -111,8 +111,8 @@ public class ChessPlay {
 
 
 									if (chessBlockEntity instanceof QuantumChessBoardBlockEntity qcbe){
-										qcbe.getLinkedBoard().notifyClientOfBoardChange();
-										qcbe.getLinkedBoard().playSoundForNearbyPlayers(sound);
+										qcbe.getLinkedBoardEntity().notifyClientOfBoardChange();
+										qcbe.getLinkedBoardEntity().playSoundForNearbyPlayers(sound);
 									}
 
 								} catch (InvalidMoveException e) {
