@@ -140,14 +140,4 @@ public class QuantumChessBoardBlock extends GoldChessboardBlock {
         throw new QuantumChessBoardBlockEntity.FailureToLinkQuantumChessBoardEntityException("chessmod.quantum.unmatched_board_notification");
     }
 
-    @Override
-    public void onRemove(BlockState oldState, Level world, BlockPos pos, BlockState newState, boolean isMoving) {
-        super.onRemove(oldState, world, pos, newState, isMoving);
-        if (!oldState.is(newState.getBlock())) { //block was broken
-            if (world.getBlockEntity(pos) instanceof QuantumChessBoardBlockEntity qcbe) {
-                qcbe.unlinkChessboards();
-            }
-        }
-    }
-
 }

@@ -7,6 +7,7 @@ import chessmod.setup.Registration;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.event.level.BlockEvent;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -20,6 +21,8 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
 
     protected BlockPos linkedBoardPos;
     protected String linkedDimension;
+
+
 
     public void setLinkedBoard(BlockPos pos, String dimension) {
         this.linkedBoardPos = pos;
@@ -129,6 +132,12 @@ public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
         second.setLinkedBoard(getBlockPos(), getDimension());
         second.assignLinkState(true);
         second.notifyClientOfBoardChange();
+    }
+
+    public static void onBlockBreak(BlockEvent.BreakEvent event) {
+        if (event.getLevel().getBlockEntity(event.getPos()) instanceof QuantumChessBoardBlockEntity qcbe) {
+            qcbe.unlinkChessboards();
+        }
     }
 
     /**
