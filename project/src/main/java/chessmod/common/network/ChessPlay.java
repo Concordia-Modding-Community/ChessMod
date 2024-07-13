@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import chessmod.ChessMod;
 import chessmod.blockentity.ChessboardBlockEntity;
 import chessmod.blockentity.GoldChessboardBlockEntity;
+import chessmod.blockentity.QuantumChessBoardBlockEntity;
 import chessmod.common.capability.elo.Elo;
 import chessmod.common.dom.model.chess.Move;
 import chessmod.common.dom.model.chess.board.Board;
@@ -15,9 +16,7 @@ import chessmod.setup.Registration;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
 
 
@@ -58,6 +57,7 @@ public class ChessPlay {
 
 	public static class Handler {
 		public static boolean handle(final ChessPlay message, final Supplier<NetworkEvent.Context> ctx) {
+
 			if (ctx.get().getDirection().getReceptionSide().isServer()) {
 				ctx.get().enqueueWork(new Runnable() {
 					// Use anon - lambda causes classloading issues
@@ -66,12 +66,11 @@ public class ChessPlay {
 						Level world = ctx.get().getSender().level();
 						BlockPos pos = new BlockPos((int) message.x, (int) message.y, (int) message.z);
 						if(world.isLoaded(pos)) {
-							
-							BlockEntity blockEntity = world.getBlockEntity(pos);
-							if (blockEntity instanceof ChessboardBlockEntity) {
-								Board board = ((ChessboardBlockEntity)blockEntity).getBoard();
+
+							if (world.getBlockEntity(pos) instanceof ChessboardBlockEntity chessBlockEntity) {
+								Board board = chessBlockEntity.getBoard();
 								Move m = Move.create((int)message.move, board);
-								
+
 								SoundEvent sound = null;
 								if(board.pieceAt(m.getSource()) instanceof Knight) {
 									if(board.pieceAt(m.getTarget()) == null) {
@@ -88,24 +87,41 @@ public class ChessPlay {
 								}
 
 								try { //On GoldChessBoard confirm that it is a valid move!
-									if (blockEntity instanceof GoldChessboardBlockEntity) {
+									if (chessBlockEntity instanceof GoldChessboardBlockEntity || chessBlockEntity instanceof QuantumChessBoardBlockEntity) {
 										board.moveSafely(m);
-										if(board.getCheckMate() != null) {
+
+										if (board.getCheckMate() != null) {
 											Logger.getGlobal().info(ctx.get().getSender().getName().getString() + " has won a chess game with themselves!");
 											Elo.updateElo(ctx.get().getSender(), ctx.get().getSender(), true);
+										}
+										if (chessBlockEntity instanceof QuantumChessBoardBlockEntity qcbe) {
+											if(qcbe.getLinkedBoardEntity() == null) {
+												Logger.getGlobal().info(ctx.get().getSender().getName().getString() + " played on an unlinked board!");
+											} else {
+												Logger.getGlobal().info(ctx.get().getSender().getName().getString() + " played on an linked board!");
+												qcbe.getLinkedBoardEntity().getBoard().moveSafely(m);
+											}
 										}
 									} else {
 										board.move(m);
 									}
-									((ChessboardBlockEntity)blockEntity).notifyClientOfBoardChange();
-									world.playSound(null, pos, sound, SoundSource.BLOCKS, 1F, 1F);
+
+									chessBlockEntity.notifyClientOfBoardChange();
+									chessBlockEntity.playSoundForNearbyPlayers(sound);
+
+
+									if (chessBlockEntity instanceof QuantumChessBoardBlockEntity qcbe){
+										qcbe.getLinkedBoardEntity().notifyClientOfBoardChange();
+										qcbe.getLinkedBoardEntity().playSoundForNearbyPlayers(sound);
+									}
+
 								} catch (InvalidMoveException e) {
 									ChessMod.LOGGER.debug(e.getMessage());
 									e.printStackTrace();
 								}
 
 							}
-							
+
 						}
 					}
 				});
