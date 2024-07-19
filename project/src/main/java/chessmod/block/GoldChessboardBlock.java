@@ -17,6 +17,10 @@ public class GoldChessboardBlock extends ChessboardBlock {
 	public GoldChessboardBlock() {
 		super();	
 	}
+
+	public GoldChessboardBlock(Properties props) {
+		super(props);
+	}
 	
 	@Nullable
 	@Override

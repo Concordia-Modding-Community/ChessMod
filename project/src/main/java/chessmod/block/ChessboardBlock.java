@@ -31,7 +31,10 @@ public abstract class ChessboardBlock extends GlassBlock implements EntityBlock 
 	public ChessboardBlock() {
 		super(BlockBehaviour.Properties.of().noOcclusion());
 		doRegisterDefaultState();
-
+	}
+	public ChessboardBlock(Properties props) {
+		super(props.noOcclusion());
+		doRegisterDefaultState();
 	}
 
 	public void doRegisterDefaultState() {

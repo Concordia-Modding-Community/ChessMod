@@ -19,6 +19,7 @@
   "block.chessmod.ai_chessboard": "Un échiquier IA",
   "block.chessmod.puzzle_chessboard": "Un échiquier casse-tête",
   "block.chessmod.quantum_chessboard": "Un échiquier quantique",
+  "tooltip.chessmod.quantum_chessboard": "Peut être lié avec des Ender perles.",
 
   "item.chessmod.chess_wrench": "Une clé à échecs",
   "advancement.chessmod:woodChessboardPickup": "Ça devient sérieux!",

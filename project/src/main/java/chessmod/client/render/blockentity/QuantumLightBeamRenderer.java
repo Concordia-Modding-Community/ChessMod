@@ -54,7 +54,8 @@ public class QuantumLightBeamRenderer {
         //first section, and then fade both to 0
         final float initialalpha = 1f;
         final float centeralphamidway = 0.5f;
-        final float topalphamidway = 0.3f;
+        final float outteralphamidway = 0.3f;
+        final float minalpha = 0.00f;
 
         Vec3 direction = end.subtract(start).normalize().scale(beamlength/64);
         Vec3 up = new Vec3(0, 1, 0);
@@ -88,7 +89,7 @@ public class QuantumLightBeamRenderer {
                 .endVertex();
         //3 top half main part
         buffer.vertex(matrix, (float) (0.5 + direction.x), (float) (0.5+beamwidthoffset+direction.y), (float) (0.5 + direction.z))
-                .color(color[0], color[1], color[2], topalphamidway)
+                .color(color[0], color[1], color[2], outteralphamidway)
                 .uv(beamwidth/texturewidth, offset+beamlength/texturewidth)
                 .overlayCoords(overlay)
                 .uv2(light)
@@ -106,31 +107,31 @@ public class QuantumLightBeamRenderer {
         //1 bottom half main part
         buffer.vertex(matrix, (float) (0.5), (float) (0.5), (float) (0.5))
                 .color(color[0], color[1], color[2], initialalpha)
-                .uv(0.0f, offset)
+                .uv(0.0f, beamlength/texturewidth-offset)
                 .overlayCoords(overlay)
                 .uv2(light)
-                .normal(normalMatrix, (float) -right.x(), (float) -right.y(), (float) -right.z())
+                .normal(normalMatrix, (float) right.x(), (float) right.y(), (float) right.z())
                 .endVertex();
         //2 bottom half main part
         buffer.vertex(matrix, (float) (0.5 + direction.x), (float) (0.5+direction.y), (float) (0.5 + direction.z))
                 .color(color[0], color[1], color[2], centeralphamidway)
-                .uv(0.0f, offset+beamlength/texturewidth)
+                .uv(0.0f, -offset)
                 .overlayCoords(overlay)
                 .uv2(light)
                 .normal(normalMatrix, (float) right.x(), (float) right.y(), (float) right.z())
                 .endVertex();
         //3 bottom half main part
         buffer.vertex(matrix, (float) (0.5 + direction.x), (float) (0.5 - beamwidthoffset+direction.y), (float) (0.5 + direction.z))
-                .color(color[0], color[1], color[2], topalphamidway)
-                .uv(beamwidth/texturewidth, offset+beamlength/texturewidth)
+                .color(color[0], color[1], color[2], outteralphamidway)
+                .uv(beamwidth/texturewidth, -offset)
                 .overlayCoords(overlay)
                 .uv2(light)
-                .normal(normalMatrix, (float) -right.x(), (float) -right.y(), (float) -right.z())
+                .normal(normalMatrix, (float) right.x(), (float) right.y(), (float) right.z())
                 .endVertex();
         //4 bottom half main part
         buffer.vertex(matrix, (float) (0.5), (float) (0.5 - beamwidthoffset), (float) (0.5))
                 .color(color[0], color[1], color[2], initialalpha)
-                .uv(beamwidth/texturewidth, offset)
+                .uv(beamwidth/texturewidth, beamlength/texturewidth-offset)
                 .overlayCoords(overlay)
                 .uv2(light)
                 .normal(normalMatrix, (float) right.x(), (float) right.y(), (float) right.z())
@@ -142,11 +143,11 @@ public class QuantumLightBeamRenderer {
                 .uv(0.0f, offset)
                 .overlayCoords(overlay)
                 .uv2(light)
-                .normal(normalMatrix, (float) -right.x(), (float) -right.y(), (float) -right.z())
+                .normal(normalMatrix, (float) right.x(), (float) right.y(), (float) right.z())
                 .endVertex();
         //2 top half fade part
         buffer.vertex(matrix, (float) (0.5 + direction.x*2), (float) (0.5+direction.y*2), (float) (0.5 + direction.z*2))
-                .color(color[0], color[1], color[2], 0f)
+                .color(color[0], color[1], color[2], minalpha)
                 .uv(0.0f, offset+beamlength/texturewidth)
                 .overlayCoords(overlay)
                 .uv2(light)
@@ -154,7 +155,7 @@ public class QuantumLightBeamRenderer {
                 .endVertex();
         //3 top half fade part
         buffer.vertex(matrix, (float) (0.5 + direction.x*2), (float) (0.5+beamwidthoffset+direction.y*2), (float) (0.5 + direction.z*2))
-                .color(color[0], color[1], color[2], 0f)
+                .color(color[0], color[1], color[2], minalpha)
                 .uv(beamwidth/texturewidth, offset+beamlength/texturewidth)
                 .overlayCoords(overlay)
                 .uv2(light)
@@ -162,8 +163,8 @@ public class QuantumLightBeamRenderer {
                 .endVertex();
         //4 top half fade part (same as 3 main)
         buffer.vertex(matrix, (float) (0.5 + direction.x), (float) (0.5+beamwidthoffset+direction.y), (float) (0.5 + direction.z))
-                .color(color[0], color[1], color[2], topalphamidway)
-                .uv(beamwidth/texturewidth, offset+beamlength/texturewidth)
+                .color(color[0], color[1], color[2], outteralphamidway)
+                .uv(beamwidth/texturewidth, offset)
                 .overlayCoords(overlay)
                 .uv2(light)
                 .normal(normalMatrix, (float) -right.x(), (float) -right.y(), (float) -right.z())
@@ -172,31 +173,31 @@ public class QuantumLightBeamRenderer {
         //1 bottom half fade part
         buffer.vertex(matrix, (float) (0.5 + direction.x), (float) (0.5+direction.y), (float) (0.5 + direction.z))
                 .color(color[0], color[1], color[2], centeralphamidway)
-                .uv(0.0f, offset)
+                .uv(0.0f, beamlength/texturewidth-offset)
                 .overlayCoords(overlay)
                 .uv2(light)
-                .normal(normalMatrix, (float) -right.x(), (float) -right.y(), (float) -right.z())
+                .normal(normalMatrix, (float) right.x(), (float) right.y(), (float) right.z())
                 .endVertex();
         //2 bottom half fade part
         buffer.vertex(matrix, (float) (0.5 + direction.x*2), (float) (0.5+direction.y*2), (float) (0.5 + direction.z*2))
-                .color(color[0], color[1], color[2], 0f)
-                .uv(0.0f, offset+beamlength/texturewidth)
+                .color(color[0], color[1], color[2], minalpha)
+                .uv(0.0f, -offset)
                 .overlayCoords(overlay)
                 .uv2(light)
                 .normal(normalMatrix, (float) right.x(), (float) right.y(), (float) right.z())
                 .endVertex();
         //3 bottom half fade part
         buffer.vertex(matrix, (float) (0.5 + direction.x*2), (float) (0.5 - beamwidthoffset+direction.y*2), (float) (0.5 + direction.z*2))
-                .color(color[0], color[1], color[2], 0)
-                .uv(beamwidth/texturewidth, offset+beamlength/texturewidth)
+                .color(color[0], color[1], color[2], minalpha)
+                .uv(beamwidth/texturewidth, -offset)
                 .overlayCoords(overlay)
                 .uv2(light)
-                .normal(normalMatrix, (float) -right.x(), (float) -right.y(), (float) -right.z())
+                .normal(normalMatrix, (float) right.x(), (float) right.y(), (float) right.z())
                 .endVertex();
         //4 bottom half fade part (same as 3 main)
         buffer.vertex(matrix, (float) (0.5 + direction.x), (float) (0.5 - beamwidthoffset+direction.y), (float) (0.5 + direction.z))
-                .color(color[0], color[1], color[2], topalphamidway)
-                .uv(beamwidth/texturewidth, offset+beamlength/texturewidth)
+                .color(color[0], color[1], color[2], outteralphamidway)
+                .uv(beamwidth/texturewidth, beamlength/texturewidth-offset)
                 .overlayCoords(overlay)
                 .uv2(light)
                 .normal(normalMatrix, (float) -right.x(), (float) -right.y(), (float) -right.z())

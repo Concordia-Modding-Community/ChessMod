@@ -6,21 +6,23 @@ import chessmod.blockentity.*;
 import chessmod.common.network.ArbitraryPlacement;
 import chessmod.common.network.ChessPlay;
 import chessmod.common.network.PacketHandler;
-import chessmod.item.ChessWrench;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.*;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 /*
  * Stuart:: Used the tutorial of this as of May 30, 2022
@@ -80,7 +82,14 @@ public class Registration {
 		ITEMS.register(CHESSES_CHESSBOARD.getId().getPath(), () -> new BlockItem(CHESSES_CHESSBOARD.get(), new Item.Properties()));
 		ITEMS.register(AI_CHESSBOARD.getId().getPath(), () -> new BlockItem(AI_CHESSBOARD.get(), new Item.Properties()));
 		ITEMS.register(PUZZLE_CHESSBOARD.getId().getPath(), () -> new BlockItem(PUZZLE_CHESSBOARD.get(), new Item.Properties()));
-		ITEMS.register(QUANTUM_CHESSBOARD.getId().getPath(), () -> new BlockItem(QUANTUM_CHESSBOARD.get(), new Item.Properties()));
+		ITEMS.register(QUANTUM_CHESSBOARD.getId().getPath(), () -> new BlockItem(QUANTUM_CHESSBOARD.get(), new Item.Properties()) {
+			//ItemStack p_40572_, @Nullable Level p_40573_, List<Component> p_40574_, TooltipFlag p_40575_
+			@Override
+			public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag flag) {
+				tooltip.add(Component.translatable ("tooltip.chessmod.quantum_chessboard"));
+			}
+		}
+		);
 	}
 
 	public static final RegistryObject<SoundEvent> SLIDE_PIECE_SOUND =

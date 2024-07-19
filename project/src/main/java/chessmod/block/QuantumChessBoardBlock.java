@@ -20,9 +20,12 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -30,6 +33,10 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class QuantumChessBoardBlock extends GoldChessboardBlock {
     public static final BooleanProperty IS_LINKED = BooleanProperty.create("is_linked");
+
+    public QuantumChessBoardBlock() {
+        super(BlockBehaviour.Properties.of().lightLevel((state) -> state.getValue(IS_LINKED) ? 15 : 0));
+    }
 
     public void doRegisterDefaultState() {
         this.registerDefaultState(this.stateDefinition.any()

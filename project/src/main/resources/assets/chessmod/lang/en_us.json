@@ -19,6 +19,7 @@
   "block.chessmod.ai_chessboard": "An AI Chess Board",
   "block.chessmod.puzzle_chessboard": "An Puzzle Chess Board",
   "block.chessmod.quantum_chessboard": "A Quantum Board",
+  "tooltip.chessmod.quantum_chessboard": "Can be linked with ender pearls.",
 
   "item.chessmod.chess_wrench": "A Chess Wrench",
   "advancement.chessmod:woodChessboardPickup": "Getting Board!",
