@@ -11,10 +11,9 @@ import net.minecraftforge.event.level.BlockEvent;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Objects;
 import java.util.logging.Logger;
 
-public class QuantumChessBoardBlockEntity extends ChessboardBlockEntity{
+public class QuantumChessBoardBlockEntity extends GoldChessboardBlockEntity{
     public QuantumChessBoardBlockEntity(BlockPos pWorldPosition, BlockState pBlockState) {
         super(Registration.QUANTUM_CHESSBOARD_BE.get(), pWorldPosition, pBlockState);
     }

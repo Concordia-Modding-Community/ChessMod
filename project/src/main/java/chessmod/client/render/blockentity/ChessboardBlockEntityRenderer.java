@@ -1,29 +1,15 @@
 package chessmod.client.render.blockentity;
 
-import chessmod.block.QuantumChessBoardBlock;
-import chessmod.blockentity.QuantumChessBoardBlockEntity;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix4f;
 import org.joml.Matrix3f;
 
 import chessmod.block.ChessboardBlock;
 import chessmod.blockentity.ChessboardBlockEntity;
-import chessmod.blockentity.GoldChessboardBlockEntity;
-import chessmod.client.gui.entity.ChessboardGUI;
-import chessmod.common.Point2f;
 import chessmod.common.dom.model.chess.Point;
-import chessmod.common.dom.model.chess.Side;
 import chessmod.common.dom.model.chess.piece.Piece;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -31,77 +17,25 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 
-public class ChessboardBlockEntityRenderer implements BlockEntityRenderer<ChessboardBlockEntity> {
+public class ChessboardBlockEntityRenderer<T extends ChessboardBlockEntity> implements BlockEntityRenderer<T> {
 	public static final ResourceLocation black = new ResourceLocation("chessmod", "textures/block/black.png");
 	public static final ResourceLocation white = new ResourceLocation("chessmod", "textures/block/white.png");
 
-	private final QuantumLightBeamRenderer beamRenderer = new QuantumLightBeamRenderer();
-
 	public ChessboardBlockEntityRenderer(BlockEntityRendererProvider.Context context) { }
 
-	public void draw2DRect(VertexConsumer  bufferbuilder, PoseStack pPoseStack, Point2f p1, Point2f p2, float r, float g, float b, float a, int pPackedLight, int pPackedOverlay) {
-		Matrix4f model = pPoseStack.last().pose() ;
-		Matrix3f matrix3f = pPoseStack.last().normal();
-		bufferbuilder.vertex(model, p2.x, 1.001f, p1.y).color(r, g, b, a).uv(0, 0).overlayCoords(pPackedOverlay).uv2(pPackedLight).normal(matrix3f, 0, 1, 0).endVertex();
-		bufferbuilder.vertex(model, p1.x, 1.001f, p1.y).color(r, g, b, a).uv(0, 0).overlayCoords(pPackedOverlay).uv2(pPackedLight).normal(matrix3f, 0, 1, 0).endVertex();
-		bufferbuilder.vertex(model, p1.x, 1.001f, p2.y).color(r, g, b, a).uv(0, 0).overlayCoords(pPackedOverlay).uv2(pPackedLight).normal(matrix3f, 0, 1, 0).endVertex();
-		bufferbuilder.vertex(model, p2.x, 1.001f, p2.y).color(r, g, b, a).uv(0, 0).overlayCoords(pPackedOverlay).uv2(pPackedLight).normal(matrix3f, 0, 1, 0).endVertex();
-	}
+
 	
-	protected void showTurnColor(MultiBufferSource pBufferSource, PoseStack pPoseStack, Side s, int pPackedLight, int pPackedOverlay) {
-		//It does not seem to care what the texture is for this...
-		VertexConsumer bufferbuilder = pBufferSource.getBuffer(RenderType.entitySolid(ChessboardGUI.WHITE));
 
-		pPoseStack.pushPose();
-		float c = 0;
-		
-		if(s.equals(Side.WHITE)) {
-			c = 1;
-		}
-		
-		float x1Outter = 26f/256f;
-		float x1Inner = 29f/256f;
-		float x2Inner = 227f/256f;
-		float x2Outter = 230f/256f;
-
-		float z1Outter = 26f/256f;
-		float z1Inner = 29f/256f;
-		float z2Inner = 227f/256f;
-		float z2Outter = 230f/256f;
-
-		//top		
-		Point2f p1 = new Point2f(x1Outter, z1Outter);
-		Point2f p2 = new Point2f(x2Outter, z1Inner);
-		draw2DRect(bufferbuilder, pPoseStack, p1, p2, c, c, c, 1f, pPackedLight, pPackedOverlay);
-		//left
-		p2 = new Point2f(x1Inner, z2Outter);
-		draw2DRect(bufferbuilder, pPoseStack, p1, p2, c, c, c, 1f, pPackedLight, pPackedOverlay);
-
-		//right
-		p1 = new Point2f(x2Inner, z1Outter);
-		p2 = new Point2f(x2Outter, z2Outter);
-		draw2DRect(bufferbuilder,pPoseStack, p1, p2, c, c, c, 1f, pPackedLight, pPackedOverlay);
-
-		//bottom
-		p1 = new Point2f(x1Outter, z2Inner);
-		draw2DRect(bufferbuilder, pPoseStack, p1, p2, c, c, c, 1f, pPackedLight, pPackedOverlay);
-
-		pPoseStack.popPose();
-	}
 	
 	
 	/**
 	 * Render our BlockEntity
 	 */
 	@Override
-	public void render(ChessboardBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack,
+	public void render(T pBlockEntity, float pPartialTick, PoseStack pPoseStack,
 			MultiBufferSource pBufferSource, int pPackedLight, int pPackedOverlay) {
 
-		if(pBlockEntity instanceof GoldChessboardBlockEntity || pBlockEntity instanceof QuantumChessBoardBlockEntity) {
-	        //Draw current-turn indicator:
-	        showTurnColor(pBufferSource, pPoseStack, pBlockEntity.getBoard().getCurrentPlayer(), pPackedLight, pPackedOverlay);
-		}
-
+		//Draw black pieces
         pPoseStack.pushPose();
         rotateForBoardFacing(pBlockEntity, pPoseStack);
         VertexConsumer bufferbuilder = pBufferSource.getBuffer(RenderType.entityCutout(black));
@@ -134,13 +68,13 @@ public class ChessboardBlockEntityRenderer implements BlockEntityRenderer<Chessb
          }
          pPoseStack.popPose();
 
-         
+
+		//Draw white pieces
          pPoseStack.pushPose();
          rotateForBoardFacing(pBlockEntity, pPoseStack);
          bufferbuilder = pBufferSource.getBuffer(RenderType.entityCutout(white));
          RenderSystem.setShaderTexture(0, white);
-         
-         
+
          for(int by = 0; by < 8; by++) { 
         	 for(int bx = 0; bx < 8; bx++) {
         		 Piece piece = pBlockEntity.getBoard().pieceAt(Point.create(bx, by));
@@ -170,19 +104,6 @@ public class ChessboardBlockEntityRenderer implements BlockEntityRenderer<Chessb
 
          pPoseStack.popPose();
 
-		pPoseStack.pushPose();
-		if (pBlockEntity instanceof QuantumChessBoardBlockEntity) {
-			QuantumChessBoardBlockEntity qcbe = (QuantumChessBoardBlockEntity) pBlockEntity;
-			if (qcbe.getBlockState().hasProperty(QuantumChessBoardBlock.IS_LINKED)) {
-				BlockPos startPos = qcbe.getBlockPos();
-				BlockPos endPos = qcbe.getLinkedBoardPos();
-				if (endPos != null) {
-					beamRenderer.renderBeam(startPos, endPos, pPoseStack, pBufferSource, pPackedLight, pPackedOverlay);
-				}
-			}
-		}
-		pPoseStack.popPose();
-         
 	}
 
 	private void rotateForBoardFacing(ChessboardBlockEntity pBlockEntity, PoseStack pPoseStack) {
